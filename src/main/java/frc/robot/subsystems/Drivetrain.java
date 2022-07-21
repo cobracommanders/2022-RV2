@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.SwerveConstants.*;
 
 public class Drivetrain extends SubsystemBase {
   /**
