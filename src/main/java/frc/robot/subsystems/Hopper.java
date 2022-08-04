@@ -12,7 +12,7 @@ import static frc.robot.Constants.HopperConstants.*;
 public class Hopper extends SubsystemBase {
 	private final TalonSRX hopperFront = new TalonSRX(kFrontHopperID);
 	private final TalonSRX hopperBack = new TalonSRX(kBackHopperID);
-	private final ColorSensorV3 placeholder = new ColorSensorV3(null);
+	private final ColorSensorV3 colorSensor = new ColorSensorV3(null);
 
 	private HopperState currentState = HopperState.IDLE;
 	private Alliance alliance = Alliance.Invalid;
@@ -40,7 +40,7 @@ public class Hopper extends SubsystemBase {
 	}
 
 	public boolean isCargoInHopperBottom() {
-		return (placeholder.getProximity() / 2047) > kProximitySensorLeniency;
+		return (colorSensor.getProximity() / 2047) > kProximitySensorLeniency;
 	}
 
 	public void isCargoInHopperTop() {
@@ -48,9 +48,9 @@ public class Hopper extends SubsystemBase {
 	}
 
 	public boolean isCargoCorrectColor() {
-		double r = (double) placeholder.getRed();
-		double g = (double) placeholder.getGreen();
-		double b = (double) placeholder.getBlue();
+		double r = (double) colorSensor.getRed();
+		double g = (double) colorSensor.getGreen();
+		double b = (double) colorSensor.getBlue();
 		double mag = r + g + b;
 		double blue = b / mag;
 		double red = r / mag;
