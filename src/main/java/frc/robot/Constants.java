@@ -6,6 +6,7 @@ public final class Constants {
 		public static final int kBackHopperID = 0;
 
 		public static final double kColorSensorLeniency = 0.5;
+		public static final double kProximitySensorLeniency = 0.5;
 	}
 
 	public static final class SwerveConstants {

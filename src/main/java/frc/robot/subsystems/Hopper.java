@@ -4,6 +4,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.HopperConstants.*;
 
@@ -13,6 +15,7 @@ public class Hopper extends SubsystemBase {
 	private final ColorSensorV3 placeholder = new ColorSensorV3(null);
 
 	private HopperState currentState = HopperState.IDLE;
+	private Alliance alliance = Alliance.Invalid;
 
 	public enum HopperState {
 		LOAD,
@@ -21,15 +24,10 @@ public class Hopper extends SubsystemBase {
 		IDLE;
 	}
 
-	public enum CargoColor {
-		RED,
-		BLUE,
-		EMPTY;
-	}
-
 	public Hopper() {
 		hopperBack.setInverted(false);
 		hopperFront.setInverted(false);
+		alliance = DriverStation.getAlliance();
 	}
 
 	@Override
@@ -41,7 +39,15 @@ public class Hopper extends SubsystemBase {
 		currentState = newState;
 	}
 
-	public CargoColor getCargoColor() {
+	public boolean isCargoInHopperBottom() {
+		return (placeholder.getProximity() / 2047) > kProximitySensorLeniency;
+	}
+
+	public void isCargoInHopperTop() {
+		return;
+	}
+
+	public boolean isCargoCorrectColor() {
 		double r = (double) placeholder.getRed();
 		double g = (double) placeholder.getGreen();
 		double b = (double) placeholder.getBlue();
@@ -49,11 +55,8 @@ public class Hopper extends SubsystemBase {
 		double blue = b / mag;
 		double red = r / mag;
 
-		if (blue > kColorSensorLeniency)
-			return CargoColor.BLUE;
-		else if (red > kColorSensorLeniency)
-			return CargoColor.RED;
-		return CargoColor.EMPTY;
+		return ((blue > kColorSensorLeniency && alliance == Alliance.Blue)
+				|| ((red > kColorSensorLeniency && alliance == Alliance.Red)));
 	}
 
 	private void applyState(HopperState state) {
