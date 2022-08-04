@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
@@ -27,7 +23,7 @@ public class Drivetrain extends SubsystemBase {
 	 * This can be reduced to cap the robot's maximum speed. Typically, this is
 	 * useful during initial testing of the robot.
 	 */
-	public static final double MAX_VOLTAGE = 12.0;
+	public static final double kMaxVoltage = 12.0;
 	// TODO Measure the drivetrain's maximum velocity or calculate the theoretical.
 	// The formula for calculating the theoretical maximum velocity is:
 	// <Motor free speed RPM> / 60 * <Drive reduction> * <Wheel diameter meters> *
@@ -43,7 +39,7 @@ public class Drivetrain extends SubsystemBase {
 	 * This is a measure of how fast the robot should be able to drive in a straight
 	 * line.
 	 */
-	public static final double MAX_VELOCITY_METERS_PER_SECOND = 6380.0 / 60.0 *
+	public static final double kMaxVelocityMetersPerSecond = 6380.0 / 60.0 *
 			SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
 			SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
 	/**
@@ -53,102 +49,102 @@ public class Drivetrain extends SubsystemBase {
 	 */
 	// Here we calculate the theoretical maximum angular velocity. You can also
 	// replace this with a measured amount.
-	public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = MAX_VELOCITY_METERS_PER_SECOND /
-			Math.hypot(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0);
+	public static final double MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND = kMaxVelocityMetersPerSecond /
+			Math.hypot(kDrivetrainTrackwidthMeters / 2.0, kDrivetrainWheelbaseMeters / 2.0);
 
-	private final SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(
+	private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
 			// Front left
-			new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0),
+			new Translation2d(kDrivetrainTrackwidthMeters / 2.0, kDrivetrainWheelbaseMeters / 2.0),
 			// Front right
-			new Translation2d(DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0),
+			new Translation2d(kDrivetrainTrackwidthMeters / 2.0, -kDrivetrainWheelbaseMeters / 2.0),
 			// Back left
-			new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, DRIVETRAIN_WHEELBASE_METERS / 2.0),
+			new Translation2d(-kDrivetrainTrackwidthMeters / 2.0, kDrivetrainWheelbaseMeters / 2.0),
 			// Back right
-			new Translation2d(-DRIVETRAIN_TRACKWIDTH_METERS / 2.0, -DRIVETRAIN_WHEELBASE_METERS / 2.0));
+			new Translation2d(-kDrivetrainTrackwidthMeters / 2.0, -kDrivetrainWheelbaseMeters / 2.0));
 
 	// TODO Check that rotating the robot counter-clockwise causes the angle reading
 	// to increase
-	private final PigeonIMU m_pigeon = new PigeonIMU(DRIVETRAIN_PIGEON_ID);
+	private final PigeonIMU pigeon = new PigeonIMU(kPigeonID);
 
 	// These are our modules. We initialize them in the constructor.
-	private final SwerveModule m_frontLeftModule;
-	private final SwerveModule m_frontRightModule;
-	private final SwerveModule m_backLeftModule;
-	private final SwerveModule m_backRightModule;
+	private final SwerveModule frontLeftModule;
+	private final SwerveModule frontRightModule;
+	private final SwerveModule backLeftModule;
+	private final SwerveModule backRightModule;
 
-	private ChassisSpeeds m_chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
+	private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
 	public Drivetrain() {
 		ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
-		m_frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(
+		frontLeftModule = Mk4SwerveModuleHelper.createFalcon500(
 				// This parameter is optional, but will allow you to see the current state of
 				// the module on the dashboard.
 				tab.getLayout("Front Left Module", BuiltInLayouts.kList)
 						.withSize(2, 4)
 						.withPosition(0, 0),
 				Mk4SwerveModuleHelper.GearRatio.L2,
-				FRONT_LEFT_MODULE_DRIVE_MOTOR,
-				FRONT_LEFT_MODULE_STEER_MOTOR,
-				FRONT_LEFT_MODULE_STEER_ENCODER,
+				kFrontLeftModuleDriveID,
+				kFrontLeftModuleSteerID,
+				kFrontLeftModuleEncoderID,
 				// This is how much the steer encoder is offset from true zero (In our case,
 				// zero is facing straight forward)
-				FRONT_LEFT_MODULE_STEER_OFFSET);
+				kFrontLeftModuleOffset);
 
-		m_frontRightModule = Mk4SwerveModuleHelper.createFalcon500(
+		frontRightModule = Mk4SwerveModuleHelper.createFalcon500(
 				tab.getLayout("Front Right Module", BuiltInLayouts.kList)
 						.withSize(2, 4)
 						.withPosition(2, 0),
 				Mk4SwerveModuleHelper.GearRatio.L2,
-				FRONT_RIGHT_MODULE_DRIVE_MOTOR,
-				FRONT_RIGHT_MODULE_STEER_MOTOR,
-				FRONT_RIGHT_MODULE_STEER_ENCODER,
-				FRONT_RIGHT_MODULE_STEER_OFFSET);
+				kFrontRightModuleDriveID,
+				kFrontRightModuleSteerID,
+				kFrontRightModuleEncoderID,
+				kFrontRightModuleOffset);
 
-		m_backLeftModule = Mk4SwerveModuleHelper.createFalcon500(
+		backLeftModule = Mk4SwerveModuleHelper.createFalcon500(
 				tab.getLayout("Back Left Module", BuiltInLayouts.kList)
 						.withSize(2, 4)
 						.withPosition(4, 0),
 				Mk4SwerveModuleHelper.GearRatio.L2,
-				BACK_LEFT_MODULE_DRIVE_MOTOR,
-				BACK_LEFT_MODULE_STEER_MOTOR,
-				BACK_LEFT_MODULE_STEER_ENCODER,
-				BACK_LEFT_MODULE_STEER_OFFSET);
+				kBackLeftModuleDriveID,
+				kBackLeftModuleSteerID,
+				kBackLeftModuleEncoderID,
+				kBackLeftModuleOffset);
 
-		m_backRightModule = Mk4SwerveModuleHelper.createFalcon500(
+		backRightModule = Mk4SwerveModuleHelper.createFalcon500(
 				tab.getLayout("Back Right Module", BuiltInLayouts.kList)
 						.withSize(2, 4)
 						.withPosition(6, 0),
 				Mk4SwerveModuleHelper.GearRatio.L2,
-				BACK_RIGHT_MODULE_DRIVE_MOTOR,
-				BACK_RIGHT_MODULE_STEER_MOTOR,
-				BACK_RIGHT_MODULE_STEER_ENCODER,
-				BACK_RIGHT_MODULE_STEER_OFFSET);
+				kBackRightModuleDriveID,
+				kBackRightModuleSteerID,
+				kBackRightModuleEncoderID,
+				kBackRightModuleOffset);
 	}
 
 	public void zeroGyro() {
-		m_pigeon.setFusedHeading(0.0);
+		pigeon.setFusedHeading(0.0);
 	}
 
 	public Rotation2d getGyro() {
-		return Rotation2d.fromDegrees(m_pigeon.getFusedHeading());
+		return Rotation2d.fromDegrees(pigeon.getFusedHeading());
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
-		m_chassisSpeeds = chassisSpeeds;
+		this.chassisSpeeds = chassisSpeeds;
 	}
 
 	@Override
 	public void periodic() {
-		SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-		SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
+		SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
+		SwerveDriveKinematics.desaturateWheelSpeeds(states, kMaxVelocityMetersPerSecond);
 
-		m_frontLeftModule.set(states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+		frontLeftModule.set(states[0].speedMetersPerSecond / kMaxVelocityMetersPerSecond * kMaxVoltage,
 				states[0].angle.getRadians());
-		m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+		frontRightModule.set(states[1].speedMetersPerSecond / kMaxVelocityMetersPerSecond * kMaxVoltage,
 				states[1].angle.getRadians());
-		m_backLeftModule.set(states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+		backLeftModule.set(states[2].speedMetersPerSecond / kMaxVelocityMetersPerSecond * kMaxVoltage,
 				states[2].angle.getRadians());
-		m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
+		backRightModule.set(states[3].speedMetersPerSecond / kMaxVelocityMetersPerSecond * kMaxVoltage,
 				states[3].angle.getRadians());
 	}
 }
