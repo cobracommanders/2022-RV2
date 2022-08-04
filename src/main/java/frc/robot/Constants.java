@@ -17,6 +17,12 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+	public static final class HopperConstants {
+		public static final int kFrontHopperID = 0;
+		public static final int kBackHopperID = 0;
+
+		public static final double kColorSensorLeniency = 0.5;
+	}
 
 	public static final class SwerveConstants {
 		/**
