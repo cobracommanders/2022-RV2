@@ -23,6 +23,11 @@ public final class Constants {
 		public static final double kIntakeSpeed = 0.5;
 	}
 
+	public static final class CentererConstants {
+		public static final int kCentererID = 0;
+		public static final double kCentererSpeed = 0.5;
+	}
+
 	public static final class SwerveConstants {
 		/**
 		 * The left-to-right distance between the drivetrain wheels
