@@ -9,6 +9,14 @@ public final class Constants {
 		public static final double kProximitySensorLeniency = 0.5;
 	}
 
+	public static final class WristConstants {
+		public static final int kLowerWristLimitID = 0;
+		public static final int kUpperWristLimitID = 0;
+		public static final int kLeftWristID = 0;
+		public static final int kRightWristID = 0;
+		public static final double kWristSpeed = 0.25;
+	}
+
 	public static final class SwerveConstants {
 		/**
 		 * The left-to-right distance between the drivetrain wheels
