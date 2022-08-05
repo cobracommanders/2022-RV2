@@ -7,6 +7,8 @@ public final class Constants {
 
 		public static final double kColorSensorLeniency = 0.5;
 		public static final double kProximitySensorLeniency = 0.5;
+
+		public static final double kHopperSpeed = 0.5;
 	}
 
 	public static final class WristConstants {
@@ -14,17 +16,20 @@ public final class Constants {
 		public static final int kUpperWristLimitID = 0;
 		public static final int kLeftWristID = 0;
 		public static final int kRightWristID = 0;
+
 		public static final double kWristSpeed = 0.25;
 	}
 
 	public static final class IntakeConstants {
 		public static final int kLeftIntakeID = 0;
 		public static final int kRightIntakeID = 0;
+
 		public static final double kIntakeSpeed = 0.5;
 	}
 
 	public static final class CentererConstants {
 		public static final int kCentererID = 0;
+
 		public static final double kCentererSpeed = 0.5;
 	}
 

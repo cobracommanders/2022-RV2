@@ -23,7 +23,6 @@ public class Hopper extends SubsystemBase {
 	public enum HopperState {
 		LOAD,
 		OUTTAKE,
-		PLACE,
 		IDLE;
 	}
 
@@ -51,10 +50,10 @@ public class Hopper extends SubsystemBase {
 	}
 
 	public boolean isCargoCorrectColor() {
-		double r = (double) colorSensor.getRed();
-		double g = (double) colorSensor.getGreen();
-		double b = (double) colorSensor.getBlue();
-		double mag = r + g + b;
+		int r = colorSensor.getRed();
+		int g = colorSensor.getGreen();
+		int b = colorSensor.getBlue();
+		int mag = r + g + b;
 		double blue = b / mag;
 		double red = r / mag;
 
@@ -66,22 +65,15 @@ public class Hopper extends SubsystemBase {
 		switch (state) {
 			// Set both hopper motors to pull the ball upwards
 			case LOAD:
-				hopperFront.set(ControlMode.PercentOutput, 1);
-				hopperBack.set(ControlMode.PercentOutput, 1);
+				hopperFront.set(ControlMode.PercentOutput, kHopperSpeed);
+				hopperBack.set(ControlMode.PercentOutput, kHopperSpeed);
 				break;
 
 			// Set the front motor upwards, and the back motor downwards to spin the top
 			// ball in place and eject any below it
 			case OUTTAKE:
-				hopperFront.set(ControlMode.PercentOutput, 1);
-				hopperBack.set(ControlMode.PercentOutput, -1);
-				break;
-
-			// Same as above, but at a lower speed in the case where it is better to drop
-			// the ball slowly
-			case PLACE:
-				hopperFront.set(ControlMode.PercentOutput, 0.25);
-				hopperBack.set(ControlMode.PercentOutput, -0.25);
+				hopperFront.set(ControlMode.PercentOutput, kHopperSpeed);
+				hopperBack.set(ControlMode.PercentOutput, -kHopperSpeed);
 				break;
 
 			// Idle state, pause both motors
