@@ -17,6 +17,12 @@ public final class Constants {
 		public static final double kWristSpeed = 0.25;
 	}
 
+	public static final class IntakeConstants {
+		public static final int kLeftIntakeID = 0;
+		public static final int kRightIntakeID = 0;
+		public static final double kIntakeSpeed = 0.5;
+	}
+
 	public static final class SwerveConstants {
 		/**
 		 * The left-to-right distance between the drivetrain wheels
