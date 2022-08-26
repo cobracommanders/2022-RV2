@@ -23,14 +23,20 @@ public class RobotContainer {
 				new DefaultDrive(
 						drivetrain,
 						// X axis translation
-						() -> driverController.getLeftX(),
+						() -> deadzone(driverController.getLeftX(), 0.1),
 						// Y axis translation
-						() -> driverController.getLeftY(),
+						() -> deadzone(driverController.getLeftY(), 0.1),
 						// Rotation
-						() -> driverController.getRightY()));
+						() -> deadzone(driverController.getRightX(), 0.1)));
 	}
 
 	private void configureButtonBindings() {
 
+	}
+
+	private double deadzone(double input, double deadzone) {
+		if (Math.abs(input) > deadzone)
+			return input;
+		return 0;
 	}
 }

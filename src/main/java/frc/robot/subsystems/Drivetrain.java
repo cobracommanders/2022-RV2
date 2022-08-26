@@ -130,7 +130,8 @@ public class Drivetrain extends SubsystemBase {
 
 	public Rotation2d getGyro() {
 		//return Rotation2d.fromDegrees(pigeon.getFusedHeading());
-		return Rotation2d.fromDegrees(IMU.getGyroAngleZ());
+		//return Rotation2d.fromDegrees(IMU.getGyroAngleZ());
+		return Rotation2d.fromDegrees(0);
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
