@@ -33,7 +33,13 @@ public final class Constants {
 		public static final double kCentererSpeed = 0.5;
 	}
 
-	public static final class SwerveConstants {
+	public static final class OIConstants {
+		public static final int kDriverControllerID = 0;
+		public static final int kOperatorControllerID = 1;
+
+	}
+
+	public static final class DrivetrainConstants {
 		/**
 		 * The left-to-right distance between the drivetrain wheels
 		 *
