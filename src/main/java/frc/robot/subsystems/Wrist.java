@@ -47,7 +47,7 @@ public class Wrist extends SubsystemBase {
 			leftMotor.setVoltage(-kWristSpeed * 12);
 			return;
 		}
-		
+
 		// If none of the above are true, stop the motor
 		leftMotor.stopMotor();
 	}

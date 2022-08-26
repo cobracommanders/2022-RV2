@@ -16,8 +16,8 @@ public class Hopper extends SubsystemBase {
 
 	private HopperState currentState = HopperState.IDLE;
 	private Alliance alliance = Alliance.Invalid;
-	//TODO: Add Limelight Program in here or make Limelight file
-	//TODO: implement with limit switches
+	// TODO: Add Limelight Program in here or make Limelight file
+	// TODO: implement with limit switches
 	public static int currentBallCount;
 
 	public enum HopperState {
