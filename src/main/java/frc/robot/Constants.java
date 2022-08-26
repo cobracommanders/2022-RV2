@@ -55,27 +55,27 @@ public final class Constants {
 
 		public static final int kPigeonID = 0; // TODO Set Pigeon ID
 
-		public static final int kFrontLeftModuleDriveID = 0; // TODO Set front left module drive motor ID
-		public static final int kFrontLeftModuleSteerID = 0; // TODO Set front left module steer motor ID
-		public static final int kFrontLeftModuleEncoderID = 0; // TODO Set front left steer encoder ID
+		public static final int kFrontLeftModuleDriveID = 3;
+		public static final int kFrontLeftModuleSteerID = 4;
+		public static final int kFrontLeftModuleEncoderID = 12;
 		public static final double kFrontLeftModuleOffset = -Math.toRadians(0.0); // TODO Measure and set front
 																					// left steer offset
 
-		public static final int kFrontRightModuleDriveID = 0; // TODO Set front right drive motor ID
-		public static final int kFrontRightModuleSteerID = 0; // TODO Set front right steer motor ID
-		public static final int kFrontRightModuleEncoderID = 0; // TODO Set front right steer encoder ID
+		public static final int kFrontRightModuleDriveID = 5;
+		public static final int kFrontRightModuleSteerID = 6;
+		public static final int kFrontRightModuleEncoderID = 13;
 		public static final double kFrontRightModuleOffset = -Math.toRadians(0.0); // TODO Measure and set
 																					// front right steer offset
 
-		public static final int kBackLeftModuleDriveID = 0; // TODO Set back left drive motor ID
-		public static final int kBackLeftModuleSteerID = 0; // TODO Set back left steer motor ID
-		public static final int kBackLeftModuleEncoderID = 0; // TODO Set back left steer encoder ID
+		public static final int kBackLeftModuleDriveID = 1;
+		public static final int kBackLeftModuleSteerID = 2;
+		public static final int kBackLeftModuleEncoderID = 11;
 		public static final double kBackLeftModuleOffset = -Math.toRadians(0.0); // TODO Measure and set back
 																					// left steer offset
 
-		public static final int kBackRightModuleDriveID = 0; // TODO Set back right drive motor ID
-		public static final int kBackRightModuleSteerID = 0; // TODO Set back right steer motor ID
-		public static final int kBackRightModuleEncoderID = 0; // TODO Set back right steer encoder ID
+		public static final int kBackRightModuleDriveID = 7;
+		public static final int kBackRightModuleSteerID = 8;
+		public static final int kBackRightModuleEncoderID = 14;
 		public static final double kBackRightModuleOffset = -Math.toRadians(0.0); // TODO Measure and set back
 																					// right steer offset
 	}

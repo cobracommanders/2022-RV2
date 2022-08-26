@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.sensors.PigeonIMU;
+//import com.ctre.phoenix.sensors.PigeonIMU;
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.ADIS16448_IMU;
 
 import static frc.robot.Constants.DrivetrainConstants.*;
 
@@ -64,7 +65,8 @@ public class Drivetrain extends SubsystemBase {
 
 	// TODO Check that rotating the robot counter-clockwise causes the angle reading
 	// to increase
-	private final PigeonIMU pigeon = new PigeonIMU(kPigeonID);
+	//private final PigeonIMU pigeon = new PigeonIMU(kPigeonID);
+	private final ADIS16448_IMU IMU = new ADIS16448_IMU();
 
 	// These are our modules. We initialize them in the constructor.
 	private final SwerveModule frontLeftModule;
@@ -122,11 +124,13 @@ public class Drivetrain extends SubsystemBase {
 	}
 
 	public void zeroGyro() {
-		pigeon.setFusedHeading(0.0);
+		//pigeon.setFusedHeading(0.0);
+		IMU.reset();
 	}
 
 	public Rotation2d getGyro() {
-		return Rotation2d.fromDegrees(pigeon.getFusedHeading());
+		//return Rotation2d.fromDegrees(pigeon.getFusedHeading());
+		return Rotation2d.fromDegrees(IMU.getGyroAngleZ());
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
