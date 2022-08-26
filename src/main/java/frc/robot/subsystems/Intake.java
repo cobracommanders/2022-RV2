@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+/*package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -51,3 +51,4 @@ public class Intake extends SubsystemBase {
 		currentState = state;
 	}
 }
+*/
