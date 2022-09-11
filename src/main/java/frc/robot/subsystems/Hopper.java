@@ -1,18 +1,22 @@
-/*package frc.robot.subsystems;
+package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.HopperConstants.*;
 
 public class Hopper extends SubsystemBase {
 	private final TalonSRX hopperFront = new TalonSRX(kFrontHopperID);
 	private final TalonSRX hopperBack = new TalonSRX(kBackHopperID);
-	private final ColorSensorV3 colorSensor = new ColorSensorV3(null);
+	private final ColorSensorV3 colorSensor = new ColorSensorV3(Port.kOnboard);
+	private final DigitalInput upperSensor = new DigitalInput(kUpperSensorDIO);
+	private final DigitalInput lowerSensor = new DigitalInput(kLowerSensorDIO);
 
 	private HopperState currentState = HopperState.IDLE;
 	private Alliance alliance = Alliance.Invalid;
@@ -27,8 +31,8 @@ public class Hopper extends SubsystemBase {
 	}
 
 	public Hopper() {
-		hopperBack.setInverted(false);
-		hopperFront.setInverted(false);
+		hopperBack.setInverted(true);
+		hopperFront.setInverted(true);
 		alliance = DriverStation.getAlliance();
 	}
 
@@ -41,25 +45,16 @@ public class Hopper extends SubsystemBase {
 		currentState = newState;
 	}
 
-	public boolean isCargoInHopperBottom() {
-		return (colorSensor.getProximity() / 2047) > kProximitySensorLeniency;
-	}
-
-	public void isCargoInHopperTop() {
-		return;
-	}
 
 	public boolean isCargoCorrectColor() {
 		int r = colorSensor.getRed();
-		int g = colorSensor.getGreen();
 		int b = colorSensor.getBlue();
-		int mag = r + g + b;
-		double blue = b / mag;
-		double red = r / mag;
 
-		return ((blue > kColorSensorLeniency && alliance == Alliance.Blue)
-				|| ((red > kColorSensorLeniency && alliance == Alliance.Red)));
+		return ((b > kColorSensorLeniency && alliance == Alliance.Blue)
+				|| ((r > kColorSensorLeniency && alliance == Alliance.Red)));
 	}
+
+
 
 	private void applyState(HopperState state) {
 		switch (state) {
@@ -84,4 +79,3 @@ public class Hopper extends SubsystemBase {
 		}
 	}
 }
-*/

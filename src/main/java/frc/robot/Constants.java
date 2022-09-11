@@ -2,13 +2,23 @@ package frc.robot;
 
 public final class Constants {
 	public static final class HopperConstants {
-		public static final int kFrontHopperID = 0;
-		public static final int kBackHopperID = 0;
+		public static final int kFrontHopperID = 20;
+		public static final int kBackHopperID = 21;
 
-		public static final double kColorSensorLeniency = 0.5;
-		public static final double kProximitySensorLeniency = 0.5;
+		public static final double kColorSensorLeniency = 300;
+		public static final double kProximitySensorLeniency = 0;
 
-		public static final double kHopperSpeed = 0.5;
+		public static final double kHopperSpeed = 0.35;
+
+		public static final int kUpperSensorDIO = 0;
+		public static final int kLowerSensorDIO = 0;
+	}
+
+	public static final class ShooterConstants {
+		public static final int kFrontShooterID = 23;
+		public static final int kBackShooterID = 22;
+
+		public static final double kShooterSpeed = 0.25;
 	}
 
 	public static final class WristConstants {
@@ -21,17 +31,18 @@ public final class Constants {
 	}
 
 	public static final class IntakeConstants {
-		public static final int kLeftIntakeID = 0;
-		public static final int kRightIntakeID = 0;
+		public static final int kLeftIntakeID = 30;
+		public static final int kRightIntakeID = 33;
 
-		public static final double kIntakeSpeed = 0.5;
+		public static final double kIntakeSpeed = 1;
 	}
 
 	public static final class CentererConstants {
-		public static final int kCentererID = 0;
+		public static final int kCentererID = 34;
 
-		public static final double kCentererSpeed = 0.5;
+		public static final double kCentererSpeed = 0;
 	}
+	
 
 	public static final class OIConstants {
 		public static final int kDriverControllerID = 0;

@@ -1,4 +1,4 @@
-/*package frc.robot.subsystems;
+package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -20,7 +20,7 @@ public class Centerer extends SubsystemBase {
 
 	public Centerer() {
 		motor.setIdleMode(IdleMode.kCoast);
-		motor.setInverted(false);
+		motor.setInverted(true);
 	}
 
 	@Override
@@ -48,4 +48,4 @@ public class Centerer extends SubsystemBase {
 		currentState = state;
 	}
 }
-*/
+
