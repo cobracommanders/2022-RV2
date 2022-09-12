@@ -7,11 +7,16 @@ import frc.robot.subsystems.Hopper.HopperState;
 public class ShootCargo extends CommandBase {
 	private Hopper hopper;
 	private int cargoCount;
+	private boolean hasCargoExitedLow;
+	private boolean hasCargoExitedHigh;
 
 	public ShootCargo(Hopper hopper) {
 		this.hopper = hopper;
 		cargoCount = this.hopper.getCargoCount();
 		addRequirements(this.hopper);
+
+		hasCargoExitedLow = false;
+		hasCargoExitedHigh = false;
 	}
 
 	@Override
@@ -24,12 +29,8 @@ public class ShootCargo extends CommandBase {
 	}
 
 	// When the correct beam break is triggered, end the command
-	private boolean hasCargoExitedLow = false;
-	private boolean hasCargoExitedHigh = false;
-
 	@Override
 	public boolean isFinished() {
-
 		return cargoCount == 2
 				? (hasCargoExitedHigh ^ hopper.getUpperSensor()) && (!(hasCargoExitedHigh = hopper.getUpperSensor()))
 				: (hasCargoExitedLow ^ hopper.getLowerSensor()) && (!(hasCargoExitedLow = hopper.getLowerSensor()));
