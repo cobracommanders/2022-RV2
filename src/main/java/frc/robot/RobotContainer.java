@@ -4,14 +4,15 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.FieldOrientedDrive;
 import frc.robot.commands.ResetGyro;
-import frc.robot.commands.RobotOrientedDrive;
-import frc.robot.commands.SetCenterer;
-import frc.robot.commands.SetHopper;
-import frc.robot.commands.SetIntake;
-import frc.robot.commands.SetShooter;
 import frc.robot.commands.auto.SimpleTaxi;
+import frc.robot.commands.centerer.SetCenterer;
+import frc.robot.commands.drivetrain.FieldOrientedDrive;
+import frc.robot.commands.drivetrain.RobotOrientedDrive;
+import frc.robot.commands.hopper.AutoHopper;
+import frc.robot.commands.hopper.SetHopper;
+import frc.robot.commands.intake.SetIntake;
+import frc.robot.commands.shooter.SetShooter;
 import frc.robot.subsystems.Centerer;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Hopper;
@@ -50,6 +51,8 @@ public class RobotContainer {
 						// Rotation
 						() -> deadzone(((-driverController.getRightX() * 2.25) * (-driverController.getRightX() * 2.25))
 								* -driverController.getRightX(), 0.1)));
+
+		hopper.setDefaultCommand(new AutoHopper(hopper));
 	}
 
 	private void configureButtonBindings() {

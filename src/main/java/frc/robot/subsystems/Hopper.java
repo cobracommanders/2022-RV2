@@ -41,20 +41,38 @@ public class Hopper extends SubsystemBase {
 		applyState(currentState);
 	}
 
-	public void setState(HopperState newState) {
-		currentState = newState;
+	public void setState(HopperState state) {
+		currentState = state;
 	}
 
+	public boolean cargoPresent() {
+		return colorSensor.getProximity() > kProximitySensorLeniency;
+	}
 
 	public boolean isCargoCorrectColor() {
-		int r = colorSensor.getRed();
-		int b = colorSensor.getBlue();
-
-		return ((b > kColorSensorLeniency && alliance == Alliance.Blue)
-				|| ((r > kColorSensorLeniency && alliance == Alliance.Red)));
+		return ((colorSensor.getBlue() > kColorSensorLeniency && alliance == Alliance.Blue)
+				|| ((colorSensor.getRed() > kColorSensorLeniency && alliance == Alliance.Red)));
 	}
 
+	public boolean getUpperSensor() {
+		return upperSensor.get();
+	}
 
+	public boolean getLowerSensor() {
+		return lowerSensor.get();
+	}
+
+	public void addCargoCount() {
+		currentBallCount++;
+	}
+
+	public void removeCargoCount() {
+		currentBallCount--;
+	}
+
+	public int getCargoCount() {
+		return currentBallCount;
+	}
 
 	private void applyState(HopperState state) {
 		switch (state) {
