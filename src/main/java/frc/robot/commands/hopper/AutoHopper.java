@@ -16,7 +16,7 @@ public class AutoHopper extends SequentialCommandGroup {
 						new Supplier<Command>() {
 							@Override
 							public Command get() {
-								return hopper.isCargoCorrectColor() ? new ShootCargo(hopper) : new EjectCargo(hopper);
+								return hopper.isCargoCorrectColor() ? new SaveCargo(hopper) : new EjectCargo(hopper);
 							}
 						}));
 	}
