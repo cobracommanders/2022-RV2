@@ -6,12 +6,13 @@ public final class Constants {
 		public static final int kBackHopperID = 21;
 
 		public static final double kColorSensorLeniency = 300;
-		public static final double kProximitySensorLeniency = 0;
+		public static final double kProximitySensorLeniency = 150;
 
+		// 0.35
 		public static final double kHopperSpeed = 0.35;
 
 		public static final int kUpperSensorDIO = 0;
-		public static final int kLowerSensorDIO = 0;
+		public static final int kLowerSensorDIO = 3;
 	}
 
 	public static final class ShooterConstants {

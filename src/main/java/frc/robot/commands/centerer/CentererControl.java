@@ -4,11 +4,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Centerer;
 import frc.robot.subsystems.Centerer.CentererState;
 
-public class SetCenterer extends CommandBase {
+public class CentererControl extends CommandBase {
 	private final Centerer centerer;
 	private final CentererState state;
 
-	public SetCenterer(Centerer centerer, CentererState state) {
+	public CentererControl(Centerer centerer, CentererState state) {
 		this.centerer = centerer;
 		this.state = state;
 		addRequirements(this.centerer);

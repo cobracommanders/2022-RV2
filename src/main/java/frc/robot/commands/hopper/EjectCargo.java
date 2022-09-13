@@ -32,5 +32,4 @@ public class EjectCargo extends CommandBase {
 	public void end(boolean interrupted) {
 		hopper.setState(HopperState.IDLE);
 	}
-
 }

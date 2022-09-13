@@ -6,13 +6,16 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.auto.SimpleTaxi;
-import frc.robot.commands.centerer.SetCenterer;
+import frc.robot.commands.centerer.CentererControl;
 import frc.robot.commands.drivetrain.FieldOrientedDrive;
 import frc.robot.commands.drivetrain.RobotOrientedDrive;
 import frc.robot.commands.hopper.AutoHopper;
-import frc.robot.commands.hopper.SetHopper;
-import frc.robot.commands.intake.SetIntake;
-import frc.robot.commands.shooter.SetShooter;
+import frc.robot.commands.hopper.EjectCargo;
+import frc.robot.commands.hopper.SaveCargo;
+import frc.robot.commands.hopper.ShootCargo;
+import frc.robot.commands.intake.IntakeControl;
+import frc.robot.commands.testing.SetHopper;
+import frc.robot.commands.testing.SetShooter;
 import frc.robot.subsystems.Centerer;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Hopper;
@@ -83,11 +86,16 @@ public class RobotContainer {
 
 		new Trigger(() -> {
 			return driverController.getRawAxis(3) > .75;
-		}).whileActiveContinuous(new SetIntake(intake, IntakeState.INTAKE).alongWith(new SetCenterer(centerer, CentererState.CENTER)));
+		}).whileActiveContinuous(new IntakeControl(intake, IntakeState.INTAKE).alongWith(new CentererControl(centerer, CentererState.CENTER)));
 
-		new JoystickButton(driverController, 3).whileHeld(new SetHopper(hopper, HopperState.LOAD));
-		new JoystickButton(driverController, 4).whileHeld(new SetHopper(hopper, HopperState.OUTTAKE));
+		new JoystickButton(driverController, 3).whenPressed(new ShootCargo(hopper));
+
 		new JoystickButton(driverController, 2).whileHeld(new SetShooter(shooter, ShooterState.SHOOT));
+
+		//new JoystickButton(driverController, 3).whenPressed(new EjectCargo(hopper));
+		//new JoystickButton(driverController, 4).whenPressed(new SaveCargo(hopper));
+
+
 	}
 
 	public Command getAutoCommand() {

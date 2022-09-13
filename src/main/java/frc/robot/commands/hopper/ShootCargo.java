@@ -32,14 +32,13 @@ public class ShootCargo extends CommandBase {
 	@Override
 	public boolean isFinished() {
 		return cargoCount == 2
-				? (hasCargoExitedHigh ^ hopper.getUpperSensor()) && (!(hasCargoExitedHigh = hopper.getUpperSensor()))
-				: (hasCargoExitedLow ^ hopper.getLowerSensor()) && (!(hasCargoExitedLow = hopper.getLowerSensor()));
+				? (hasCargoExitedLow ^ hopper.getLowerSensor()) && (!(hasCargoExitedLow = hopper.getLowerSensor()))
+				: (hasCargoExitedHigh ^ hopper.getUpperSensor()) && (!(hasCargoExitedHigh = hopper.getUpperSensor()));
 	}
 
 	// When the command ends, stop the motors
 	@Override
 	public void end(boolean interrupted) {
-		if (hopper.getCargoCount() >= 0)
 			hopper.removeCargoCount();
 		hopper.setState(HopperState.IDLE);
 	}
