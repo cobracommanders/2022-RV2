@@ -1,5 +1,11 @@
 package frc.robot;
 
+import static frc.robot.Constants.OIConstants.kDriverControllerID;
+import static frc.robot.Constants.OIConstants.kGyroResetButton;
+import static frc.robot.Constants.OIConstants.kOperatorControllerID;
+import static frc.robot.Constants.OIConstants.kRobotOrientedButton;
+import static frc.robot.Constants.OIConstants.kSlowSpeedDrive;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -10,23 +16,17 @@ import frc.robot.commands.centerer.CentererControl;
 import frc.robot.commands.drivetrain.FieldOrientedDrive;
 import frc.robot.commands.drivetrain.RobotOrientedDrive;
 import frc.robot.commands.hopper.AutoHopper;
-import frc.robot.commands.hopper.EjectCargo;
-import frc.robot.commands.hopper.SaveCargo;
 import frc.robot.commands.hopper.ShootCargo;
 import frc.robot.commands.intake.IntakeControl;
-import frc.robot.commands.testing.SetHopper;
 import frc.robot.commands.testing.SetShooter;
 import frc.robot.subsystems.Centerer;
+import frc.robot.subsystems.Centerer.CentererState;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Centerer.CentererState;
-import frc.robot.subsystems.Hopper.HopperState;
 import frc.robot.subsystems.Intake.IntakeState;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterState;
-
-import static frc.robot.Constants.OIConstants.*;
 
 public class RobotContainer {
 	private final Centerer centerer = new Centerer();

@@ -21,9 +21,9 @@ public class Hopper extends SubsystemBase {
 
 	private HopperState currentState = HopperState.IDLE;
 	private Alliance alliance = Alliance.Invalid;
-	// TODO: Add Limelight Program in here or make Limelight file
-	// TODO: implement with limit switches
 	public static int currentBallCount;
+
+	private double speed;
 
 	public enum HopperState {
 		LOAD,
@@ -57,8 +57,9 @@ public class Hopper extends SubsystemBase {
 			SmartDashboard.putString("command", getCurrentCommand().getName());
 	}
 
-	public void setState(HopperState state) {
+	public void setState(HopperState state, double speed) {
 		currentState = state;
+		this.speed = speed;
 	}
 
 	public CargoColor getCargoColor() {
@@ -88,7 +89,6 @@ public class Hopper extends SubsystemBase {
 
 	public void removeCargoCount() {
 		currentBallCount -= 1;
-		System.out.println("removed");
 	}
 
 	public int getCargoCount() {
@@ -99,21 +99,21 @@ public class Hopper extends SubsystemBase {
 		switch (state) {
 			// Set both hopper motors to pull the ball upwards
 			case LOAD:
-				hopperFront.set(ControlMode.PercentOutput, kHopperSpeed);
-				hopperBack.set(ControlMode.PercentOutput, kHopperSpeed);
+				hopperFront.set(ControlMode.PercentOutput, speed);
+				hopperBack.set(ControlMode.PercentOutput, speed);
 				break;
 
 			// Set the front motor upwards, and the back motor downwards to spin the top
 			// ball in place and eject any below it
 			case OUTTAKE:
-				hopperFront.set(ControlMode.PercentOutput, kHopperSpeed);
-				hopperBack.set(ControlMode.PercentOutput, -kHopperSpeed);
+				hopperFront.set(ControlMode.PercentOutput, speed);
+				hopperBack.set(ControlMode.PercentOutput, -speed);
 				break;
 
 			// Idle state, pause both motors
 			case IDLE:
-				hopperFront.set(ControlMode.PercentOutput, 0);
-				hopperBack.set(ControlMode.PercentOutput, 0);
+				hopperFront.set(ControlMode.PercentOutput, speed);
+				hopperBack.set(ControlMode.PercentOutput, speed);
 				break;
 		}
 	}

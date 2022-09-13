@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Hopper.HopperState;
 
+import static frc.robot.Constants.HopperConstants.*;
+
 public class ShootCargo extends CommandBase {
 	private Hopper hopper;
 	private int cargoCount;
@@ -25,7 +27,7 @@ public class ShootCargo extends CommandBase {
 			end(true);
 			return;
 		}
-		hopper.setState(HopperState.LOAD);
+		hopper.setState(HopperState.LOAD, kHopperLoadSpeed);
 	}
 
 	// When the correct beam break is triggered, end the command
@@ -40,7 +42,7 @@ public class ShootCargo extends CommandBase {
 	@Override
 	public void end(boolean interrupted) {
 			hopper.removeCargoCount();
-		hopper.setState(HopperState.IDLE);
+		hopper.setState(HopperState.IDLE, 0);
 	}
 
 }

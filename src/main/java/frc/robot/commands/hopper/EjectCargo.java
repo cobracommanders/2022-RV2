@@ -3,6 +3,7 @@ package frc.robot.commands.hopper;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Hopper.HopperState;
+import static frc.robot.Constants.HopperConstants.*;
 
 public class EjectCargo extends CommandBase {
 	private boolean hasCargoBeenDetected;
@@ -16,7 +17,7 @@ public class EjectCargo extends CommandBase {
 	// Starts by setting the hopper to eject
 	@Override
 	public void initialize() {
-		hopper.setState(HopperState.OUTTAKE);
+		hopper.setState(HopperState.OUTTAKE, kHopperEjectSpeed);
 
 		hasCargoBeenDetected = false;
 	}
@@ -30,6 +31,6 @@ public class EjectCargo extends CommandBase {
 	// When the command ends, stop the motors
 	@Override
 	public void end(boolean interrupted) {
-		hopper.setState(HopperState.IDLE);
+		hopper.setState(HopperState.IDLE, 0);
 	}
 }

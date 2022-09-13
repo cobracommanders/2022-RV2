@@ -9,7 +9,8 @@ public final class Constants {
 		public static final double kProximitySensorLeniency = 150;
 
 		// 0.35
-		public static final double kHopperSpeed = 0.35;
+		public static final double kHopperEjectSpeed = 0.35;
+		public static final double kHopperLoadSpeed = 0.25;
 
 		public static final int kUpperSensorDIO = 0;
 		public static final int kLowerSensorDIO = 3;

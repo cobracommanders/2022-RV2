@@ -1,8 +1,9 @@
 package frc.robot.commands.hopper;
 
+import static frc.robot.Constants.HopperConstants.kHopperLoadSpeed;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Hopper.CargoColor;
 import frc.robot.subsystems.Hopper.HopperState;
 
 public class SaveCargo extends CommandBase {
@@ -23,10 +24,10 @@ public class SaveCargo extends CommandBase {
 	public void initialize() {
 		switch (cargoCount) {
 			case 0:
-				hopper.setState(HopperState.LOAD);
+				hopper.setState(HopperState.LOAD, kHopperLoadSpeed);
 				break;
 			case 1:
-				hopper.setState(HopperState.OUTTAKE);
+				hopper.setState(HopperState.OUTTAKE, kHopperLoadSpeed);
 				break;
 			default:
 				end(true);
@@ -47,7 +48,7 @@ public class SaveCargo extends CommandBase {
 		if (hopper.getCargoCount() !=2 )
 			hopper.addCargoCount();
 
-		hopper.setState(HopperState.IDLE);
+		hopper.setState(HopperState.IDLE, 0);
 	}
 
 }
