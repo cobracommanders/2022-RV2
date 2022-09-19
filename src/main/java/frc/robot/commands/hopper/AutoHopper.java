@@ -1,27 +1,43 @@
 package frc.robot.commands.hopper;
 
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SelectCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Hopper.CargoColor;
+import frc.robot.subsystems.Hopper.HopperCargoState;
 
-public class AutoHopper extends SequentialCommandGroup {
-	public AutoHopper(Hopper hopper) {
-		addRequirements(hopper);
-		addCommands(
-				new WaitUntilCommand(() -> hopper.getCargoColor() != CargoColor.NONE),
-				new SelectCommand(
-						new Supplier<Command>() {
-							@Override
-							public Command get() {
-								return hopper.getCargoColor() == CargoColor.CORRECT
-										? new SaveCargo(hopper)
-										: new EjectCargo(hopper);
-							}
-						}));
+public class AutoHopper extends CommandBase {
+	private Hopper hopper;
+	private BooleanSupplier intakeing;
+
+	public AutoHopper(Hopper hopper, BooleanSupplier intakeing) {
+		this.hopper = hopper;
+		this.intakeing = intakeing;
+		addRequirements(this.hopper);
+	}
+
+	@Override
+	public void execute() {
+		if (hopper.getCurrentCommand() == hopper.getDefaultCommand())
+			run(hopper.getQueuedOperation());
+	}
+
+	private void run(HopperCargoState operation) {
+		
+		if (intakeing.getAsBoolean()
+				&& (hopper.getCurrentCommand() == hopper.getDefaultCommand())
+				&& !hopper.getUpperSensor()) {
+
+			hopper.getIntakeCommand().schedule(true);
+		}
+
+		if (operation == HopperCargoState.EMPTY)
+			return;
+
+		if (operation == HopperCargoState.CORRECT && !hopper.getUpperSensor()) {
+			new SaveCargoHigh(hopper).schedule(false);
+		} else if (operation == HopperCargoState.INCORRECT) {
+			new EjectCargo(hopper).schedule(false);
+		}
 	}
 }

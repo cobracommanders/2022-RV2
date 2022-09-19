@@ -1,10 +1,10 @@
 package frc.robot.commands.hopper;
 
+import static frc.robot.Constants.HopperConstants.kHopperLoadSpeed;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Hopper.HopperState;
-
-import static frc.robot.Constants.HopperConstants.*;
+import frc.robot.subsystems.Hopper.HopperSetting;
 
 public class ShootCargo extends CommandBase {
 	private Hopper hopper;
@@ -27,12 +27,15 @@ public class ShootCargo extends CommandBase {
 			end(true);
 			return;
 		}
-		hopper.setState(HopperState.LOAD, kHopperLoadSpeed);
+		hopper.setState(HopperSetting.LOAD, kHopperLoadSpeed, kHopperLoadSpeed);
 	}
 
 	// When the correct beam break is triggered, end the command
 	@Override
 	public boolean isFinished() {
+		if (hopper.getCargoCount() == 0) {
+			end(false);
+		}
 		return cargoCount == 2
 				? (hasCargoExitedLow ^ hopper.getLowerSensor()) && (!(hasCargoExitedLow = hopper.getLowerSensor()))
 				: (hasCargoExitedHigh ^ hopper.getUpperSensor()) && (!(hasCargoExitedHigh = hopper.getUpperSensor()));
@@ -41,8 +44,9 @@ public class ShootCargo extends CommandBase {
 	// When the command ends, stop the motors
 	@Override
 	public void end(boolean interrupted) {
-			hopper.removeCargoCount();
-		hopper.setState(HopperState.IDLE, 0);
+		if (!(hopper.getCargoCount() == 0))
+			hopper.subtractFromCargoCount();
+		hopper.setState(HopperSetting.IDLE, 0, 0);
 	}
 
 }

@@ -4,6 +4,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 public class RobotOrientedDrive extends CommandBase {
@@ -12,27 +13,43 @@ public class RobotOrientedDrive extends CommandBase {
 	private final DoubleSupplier translationXSupplier;
 	private final DoubleSupplier translationYSupplier;
 	private final DoubleSupplier rotationSupplier;
+	private final double deadzone;
+	private final BooleanSupplier slowDrive;
 
 	public RobotOrientedDrive(Drivetrain drivetrainSubsystem,
 			DoubleSupplier translationXSupplier,
 			DoubleSupplier translationYSupplier,
-			DoubleSupplier rotationSupplier) {
+			DoubleSupplier rotationSupplier,
+			double deadzone,
+			BooleanSupplier slowDrive) {
 		this.drivetrainSubsystem = drivetrainSubsystem;
 		this.translationXSupplier = translationXSupplier;
 		this.translationYSupplier = translationYSupplier;
 		this.rotationSupplier = rotationSupplier;
+		this.deadzone = deadzone;
+		this.slowDrive = slowDrive;
 
-		addRequirements(drivetrainSubsystem);
+		addRequirements(this.drivetrainSubsystem);
 	}
 
 	@Override
 	public void execute() {
+		double driveSpeed = slowDrive.getAsBoolean() ? 1 : 2.25;
+		double xTranslation = translationXSupplier.getAsDouble();
+		double yTranslation = translationYSupplier.getAsDouble();
+		double rotation = rotationSupplier.getAsDouble();
+
 		drivetrainSubsystem.drive(
 				new ChassisSpeeds(
-						translationXSupplier.getAsDouble(),
-						translationYSupplier.getAsDouble(),
-						rotationSupplier.getAsDouble()));
+						deadzone(((xTranslation * driveSpeed) * (xTranslation * driveSpeed)) * xTranslation, deadzone),
+						deadzone(((yTranslation * driveSpeed) * (yTranslation * driveSpeed)) * yTranslation, deadzone),
+						deadzone(((rotation * driveSpeed) * (rotation * driveSpeed)) * rotation, deadzone)));
+	}
 
+	private double deadzone(double input, double deadzone) {
+		if (Math.abs(input) > deadzone)
+			return input;
+		return 0;
 	}
 
 	@Override

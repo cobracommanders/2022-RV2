@@ -1,15 +1,15 @@
-package frc.robot.commands.testing;
+package frc.robot.commands.hopper;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Hopper.HopperState;
+import frc.robot.subsystems.Hopper.HopperSetting;
 
-public class SetHopper extends CommandBase {
+public class SetHopperManual extends CommandBase {
 	private final Hopper hopper;
-	private final HopperState state;
+	private final HopperSetting state;
 	private final double speed;
 
-	public SetHopper(Hopper hopper, HopperState state, double speed) {
+	public SetHopperManual(Hopper hopper, HopperSetting state, double speed) {
 		this.hopper = hopper;
 		this.state = state;
 		this.speed = speed;
@@ -18,7 +18,7 @@ public class SetHopper extends CommandBase {
 
 	@Override
 	public void initialize() {
-		hopper.setState(state, speed);
+		hopper.setState(state, speed, speed);
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class SetHopper extends CommandBase {
 
 	@Override
 	public void end(boolean interrupted) {
-		hopper.setState(HopperState.IDLE, 0);
+		hopper.setState(HopperSetting.IDLE, 0, 0);
 	}
 
 	@Override

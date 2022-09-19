@@ -19,21 +19,39 @@ import static frc.robot.Constants.DrivetrainConstants.kFrontRightModuleEncoderID
 import static frc.robot.Constants.DrivetrainConstants.kFrontRightModuleOffset;
 import static frc.robot.Constants.DrivetrainConstants.kFrontRightModuleSteerID;
 
+import java.util.List;
+
+import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.constraint.SwerveDriveKinematicsConstraint;
+import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 public class Drivetrain extends SubsystemBase {
 	/**
@@ -60,7 +78,8 @@ public class Drivetrain extends SubsystemBase {
 	public static final double kMaxVelocityMetersPerSecond = 6380.0 / 60.0 *
 			SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
 			SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
-	/**0
+	/**
+	 * 0
 	 * The maximum angular velocity of the robot in radians per second.
 	 * <p>
 	 * This is a measure of how fast the robot can rotate in place.
@@ -80,8 +99,11 @@ public class Drivetrain extends SubsystemBase {
 			// Back right
 			new Translation2d(-kDrivetrainTrackwidthMeters / 2.0, -kDrivetrainWheelbaseMeters / 2.0));
 
-	//private final PigeonIMU pigeon = new PigeonIMU(kPigeonID);
-	private final ADXRS450_Gyro IMU = new ADXRS450_Gyro();
+	private SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, getGyroAngle(), new Pose2d(8, 4, Rotation2d.fromDegrees(0)));
+
+	// private final PigeonIMU pigeon = new PigeonIMU(kPigeonID);
+	// private final ADXRS450_Gyro IMU = new ADXRS450_Gyro();
+	public static AHRS IMU = new AHRS(Port.kUSB1);
 
 	// These are our modules. We initialize them in the constructor.
 	private final SwerveModule frontLeftModule;
@@ -127,7 +149,6 @@ public class Drivetrain extends SubsystemBase {
 				kBackLeftModuleEncoderID,
 				kBackLeftModuleOffset);
 
-
 		backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
 				tab.getLayout("Back Right Module", BuiltInLayouts.kList)
 						.withSize(2, 4)
@@ -138,22 +159,24 @@ public class Drivetrain extends SubsystemBase {
 				kBackRightModuleEncoderID,
 				kBackRightModuleOffset);
 
-				System.out.println(kMaxVelocityMetersPerSecond);
+		System.out.println(kMaxVelocityMetersPerSecond);
 	}
 
 	public void zeroGyro() {
-		//pigeon.setFusedHeading(0.0);
+		// pigeon.setFusedHeading(0.0);
 		IMU.reset();
 	}
 
 	public Rotation2d getGyroAngle() {
-		//return Rotation2d.fromDegrees(pigeon.getFusedHeading());
-		return Rotation2d.fromDegrees(-IMU.getAngle());
+		// return Rotation2d.fromDegrees(pigeon.getFusedHeading());
+		return Rotation2d.fromDegrees(-IMU.getYaw());
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
 		this.chassisSpeeds = chassisSpeeds;
 	}
+
+	private Field2d field = new Field2d();
 
 	@Override
 	public void periodic() {
@@ -169,5 +192,95 @@ public class Drivetrain extends SubsystemBase {
 				states[2].angle.getRadians());
 		backRightModule.set(states[3].speedMetersPerSecond / kMaxVelocityMetersPerSecond * kMaxVoltage,
 				states[3].angle.getRadians());
+
+		odometry.update(getGyroAngle(), states);
+		field.setRobotPose(odometry.getPoseMeters());
+		SmartDashboard.putData(field);
 	}
+
+	/*
+	public Command getAutonomousCommand() {
+
+
+		// Create a voltage constraint to ensure we don't accelerate too fast
+	
+		var autoVoltageConstraint =
+	
+			new SwerveDriveKinematicsConstraint(
+				kinematics,
+				kMaxVelocityMetersPerSecond);
+	
+	
+		// Create config for trajectory
+	
+		TrajectoryConfig config =
+	
+			new TrajectoryConfig(
+	
+					kMaxVelocityMetersPerSecond,
+	
+					1)
+	
+				// Add kinematics to ensure max speed is actually obeyed
+	
+				.setKinematics(kinematics)
+	
+				// Apply the voltage constraint
+	
+				.addConstraint(autoVoltageConstraint);
+	
+	
+		// An example trajectory to follow.  All units in meters.
+	
+		Trajectory exampleTrajectory =
+	
+			TrajectoryGenerator.generateTrajectory(
+	
+				// Start at the origin facing the +X direction
+	
+				new Pose2d(0, 0, new Rotation2d(0)),
+	
+				// Pass through these two interior waypoints, making an 's' curve path
+	
+				List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+	
+				// End 3 meters straight ahead of where we started, facing forward
+	
+				new Pose2d(3, 0, new Rotation2d(0)),
+	
+				// Pass config
+	
+				config);
+			var thetaController =
+				new ProfiledPIDController(
+					1, 0, 0, new TrapezoidProfile.Constraints(
+            maxAngularVelocityRadiansPerSecond, .5));
+
+			thetaController.enableContinuousInput(-Math.PI, Math.PI);
+			SwerveControllerCommand swerveControllerCommand =
+				new SwerveControllerCommand(
+					exampleTrajectory,
+					odometry::getPose, // Functional interface to feed supplier
+					kinematics,
+		
+					// Position controllers
+					new PIDController(0.2, 0.0, 0.1),
+					new PIDController(0.2, 0.0, 0.1),
+					thetaController,
+					this::setModuleStates,
+					(m_robotDrive));
+	
+		// Reset odometry to the starting pose of the trajectory.
+	
+		odometry.resetPosition(exampleTrajectory.getInitialPose(), exampleTrajectory.getInitialPose().getRotation());
+	
+	
+		// Run path following command, then stop at the end.
+	
+		return SwerveControllerCommand.andThen(() -> m_robotDrive.tankDriveVolts(0, 0));
+	
+	  
+	
+	}
+	*/
 }

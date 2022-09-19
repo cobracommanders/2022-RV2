@@ -11,6 +11,7 @@ public final class Constants {
 		// 0.35
 		public static final double kHopperEjectSpeed = 0.35;
 		public static final double kHopperLoadSpeed = 0.25;
+		public static final double kHopperAlignSpeed = 0.2;
 
 		public static final int kUpperSensorDIO = 0;
 		public static final int kLowerSensorDIO = 3;
@@ -20,38 +21,36 @@ public final class Constants {
 		public static final int kFrontShooterID = 23;
 		public static final int kBackShooterID = 22;
 
-		public static final double kShooterSpeed = 0.25;
+		public static final double kP = 0.02;
 	}
 
 	public static final class WristConstants {
-		public static final int kLowerWristLimitID = 0;
-		public static final int kUpperWristLimitID = 0;
-		public static final int kLeftWristID = 0;
-		public static final int kRightWristID = 0;
-
-		public static final double kWristSpeed = 0.25;
+		public static final double kP = 0.14;
+		public static final double kPositionIn = 0;
+		public static final double kPositionOut = 2;
+		public static final int kLeftWristID = 31;
+		public static final int kRightWristID = 37;
 	}
 
 	public static final class IntakeConstants {
 		public static final int kLeftIntakeID = 30;
 		public static final int kRightIntakeID = 33;
 
-		public static final double kIntakeSpeed = 1;
+		public static final double kIntakeSpeed = 0.75;
+		// NEO 550 at 0.75
 	}
 
 	public static final class CentererConstants {
 		public static final int kCentererID = 34;
 
-		public static final double kCentererSpeed = 0;
+		public static final double kCentererSpeed = 0.7;
 	}
 	
 
 	public static final class OIConstants {
 		public static final int kDriverControllerID = 0;
 		public static final int kOperatorControllerID = 1;
-		public static final int kGyroResetButton = 1;
-		public static final int kRobotOrientedButton = 6;
-		public static final int kSlowSpeedDrive = 5;
+		public static final double kControllerRumbleRange = 1000;
 	}
 
 	public static final class DrivetrainConstants {

@@ -1,16 +1,15 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import static frc.robot.Constants.IntakeConstants.kIntakeSpeed;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.IntakeConstants.*;
 
 public class Intake extends SubsystemBase {
-	private final CANSparkMax leftMotor = new CANSparkMax(kLeftIntakeID, MotorType.kBrushless);
-	private final CANSparkMax rightMotor = new CANSparkMax(kRightIntakeID, MotorType.kBrushless);
-
+	private final TalonSRX motor = new TalonSRX(30);
 	private IntakeState currentState = IntakeState.IDLE;
 
 	public enum IntakeState {
@@ -20,10 +19,8 @@ public class Intake extends SubsystemBase {
 	}
 
 	public Intake() {
-		leftMotor.setIdleMode(IdleMode.kCoast);
-		rightMotor.setIdleMode(IdleMode.kCoast);
-		leftMotor.setInverted(false);
-		rightMotor.follow(leftMotor, true);
+		motor.setNeutralMode(NeutralMode.Coast);
+		motor.setInverted(true);
 	}
 
 	@Override
@@ -34,15 +31,15 @@ public class Intake extends SubsystemBase {
 	private void applyState(IntakeState state) {
 		switch (state) {
 			case INTAKE:
-				leftMotor.set(kIntakeSpeed);
+				motor.set(ControlMode.PercentOutput, kIntakeSpeed);
 				break;
 
 			case OUTTAKE:
-				leftMotor.set(-kIntakeSpeed);
+				motor.set(ControlMode.PercentOutput, -kIntakeSpeed);
 				break;
 
 			case IDLE:
-				leftMotor.stopMotor();
+				motor.neutralOutput();
 				break;
 		}
 	}
@@ -50,4 +47,5 @@ public class Intake extends SubsystemBase {
 	public void setState(IntakeState state) {
 		currentState = state;
 	}
+
 }
