@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.IntakeConstants.kIntakeID;
 import static frc.robot.Constants.IntakeConstants.kIntakeSpeed;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -9,13 +10,19 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake extends SubsystemBase {
-	private final TalonSRX motor = new TalonSRX(30);
+	private final TalonSRX motor = new TalonSRX(kIntakeID);
 	private IntakeState currentState = IntakeState.IDLE;
 
 	public enum IntakeState {
-		INTAKE,
-		OUTTAKE,
-		IDLE;
+		INTAKE(kIntakeSpeed),
+		OUTTAKE(-kIntakeSpeed),
+		IDLE(0);
+
+		private double speed;
+
+		private IntakeState(double speed) {
+			this.speed = speed;
+		}
 	}
 
 	public Intake() {
@@ -25,23 +32,7 @@ public class Intake extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		applyState(currentState);
-	}
-
-	private void applyState(IntakeState state) {
-		switch (state) {
-			case INTAKE:
-				motor.set(ControlMode.PercentOutput, kIntakeSpeed);
-				break;
-
-			case OUTTAKE:
-				motor.set(ControlMode.PercentOutput, -kIntakeSpeed);
-				break;
-
-			case IDLE:
-				motor.neutralOutput();
-				break;
-		}
+		motor.set(ControlMode.PercentOutput, currentState.speed);
 	}
 
 	public void setState(IntakeState state) {

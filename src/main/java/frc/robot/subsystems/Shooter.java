@@ -10,7 +10,6 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -20,16 +19,17 @@ public class Shooter extends SubsystemBase {
 
 	private double setpoint = 0;
 
-	public enum ShooterSettings {
+	public enum ShooterSetting {
 		TARMAC(13750, 1),
 		FENDER(13250, 0.1),
 		LAUNCHPAD(16500, 1.4),
+		REVERSE(-3000, 0),
 		IDLE(0, 0);
 
 		public double RPM;
 		public double angle;
 
-		private ShooterSettings(double RPM, double angle) {
+		private ShooterSetting(double RPM, double angle) {
 			this.RPM = RPM;
 			this.angle = angle;
 		}
@@ -47,7 +47,7 @@ public class Shooter extends SubsystemBase {
 		leftMotor.setInverted(false);
 		rightMotor.follow(leftMotor, FollowerType.PercentOutput);
 
-		SmartDashboard.putNumber("Shooter RPM", 0);
+		// SmartDashboard.putNumber("Shooter RPM", 0);
 	}
 
 	@Override
@@ -58,11 +58,12 @@ public class Shooter extends SubsystemBase {
 			leftMotor.neutralOutput();
 		}
 
-		SmartDashboard.putNumber("Actual RPM", leftMotor.getSelectedSensorVelocity() / 2048 / 6);
+		// SmartDashboard.putNumber("Actual RPM", leftMotor.getSelectedSensorVelocity()
+		// / 2048 / 6);
 	}
 
 	public boolean atSetpoint(double range) {
-		return Math.abs(PID.getVelocityError()) < range;
+		return Math.abs(PID.getVelocityError()) < range && (Math.signum(setpoint) != -1 && Math.signum(setpoint) != 0);
 	}
 
 	public void setSpeed(double speed) {

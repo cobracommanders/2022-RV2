@@ -16,10 +16,12 @@ public class RumbleController extends CommandBase {
 	@Override
 	public void initialize() {
 		controller.setRumble(RumbleType.kLeftRumble, power);
+		controller.setRumble(RumbleType.kRightRumble, power);
 	}
 
 	@Override
 	public void end(boolean interrupted) {
 		controller.setRumble(RumbleType.kLeftRumble, 0);
+		controller.setRumble(RumbleType.kRightRumble, 0);
 	}
 }

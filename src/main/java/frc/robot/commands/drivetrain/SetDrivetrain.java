@@ -4,14 +4,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Drivetrain;
 
-public class SetSwerve extends CommandBase {
+public class SetDrivetrain extends CommandBase {
 	private final Drivetrain drivetrainSubsystem;
 
 	private double translationX;
 	private double translationY;
 	private double rotation;
 
-	public SetSwerve(Drivetrain drivetrainSubsystem,
+	public SetDrivetrain(Drivetrain drivetrainSubsystem,
 			double translationX,
 			double translationY,
 			double rotation) {

@@ -16,6 +16,7 @@ public class Hood extends SubsystemBase {
 	private final RelativeEncoder encoder;
 	private final PIDController PID;
 	private final DigitalInput limit;
+	private ControlMode currentControlMode = ControlMode.PID;
 
 	public Hood() {
 		motor = new CANSparkMax(36, MotorType.kBrushless);
@@ -27,12 +28,16 @@ public class Hood extends SubsystemBase {
 		limit = new DigitalInput(9);
 		motor.setIdleMode(IdleMode.kBrake);
 
-		SmartDashboard.putNumber("Hood Angle", 0);
+		// SmartDashboard.putNumber("Hood Angle", 0);
+	}
+
+	public enum ControlMode {
+		PID,
+		MANUAL
 	}
 
 	public void setAngle(double angle) {
 		PID.setSetpoint(angle * -20);
-		motor.set(MathUtil.clamp(PID.calculate(encoder.getPosition()), -0.5, 0.5));
 	}
 
 	public boolean getLimit() {
@@ -51,8 +56,15 @@ public class Hood extends SubsystemBase {
 		return PID.atSetpoint();
 	}
 
+	public void setState(ControlMode state) {
+		currentControlMode = state;
+	}
+
 	@Override
 	public void periodic() {
 		SmartDashboard.putBoolean("hood limit", getLimit());
+		// SmartDashboard.putData(this);
+		if (currentControlMode == ControlMode.PID)
+			motor.set(MathUtil.clamp(PID.calculate(encoder.getPosition()), -0.5, 0.5));
 	}
 }

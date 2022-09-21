@@ -1,24 +1,24 @@
-package frc.robot.commands.climbers;
+package frc.robot.commands.climber;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Climbers;
+import frc.robot.subsystems.Climber;
 
-public class ClimberControl extends CommandBase {
+public class SetClimber extends CommandBase {
 
-	private final Climbers climbers;
+	private final Climber climber;
 	private final BooleanSupplier tuneMode;
 	private DoubleSupplier left;
 	private DoubleSupplier right;
 
-	public ClimberControl(Climbers climbers, DoubleSupplier left, DoubleSupplier right, BooleanSupplier tuneMode) {
-		this.climbers = climbers;
+	public SetClimber(Climber climber, DoubleSupplier left, DoubleSupplier right, BooleanSupplier tuneMode) {
+		this.climber = climber;
 		this.left = left;
 		this.right = right;
 		this.tuneMode = tuneMode;
-		addRequirements(this.climbers);
+		addRequirements(this.climber);
 	}
 
 	@Override
@@ -27,11 +27,11 @@ public class ClimberControl extends CommandBase {
 		double right = deadzone(this.right.getAsDouble(), 0.2);
 
 		if (tuneMode.getAsBoolean()) {
-			climbers.setSpeedLeft(left / 4);
-			climbers.setSpeedRight(right / 4);
+			climber.setSpeedLeft(left / 4);
+			climber.setSpeedRight(right / 4);
 		} else {
-			climbers.setSpeedLeft(left);
-			climbers.setSpeedRight(left);
+			climber.setSpeedLeft(left);
+			climber.setSpeedRight(left);
 		}
 	}
 

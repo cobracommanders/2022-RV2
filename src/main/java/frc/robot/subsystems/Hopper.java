@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.HopperConstants.kBackHopperID;
 import static frc.robot.Constants.HopperConstants.kColorSensorLeniency;
 import static frc.robot.Constants.HopperConstants.kFrontHopperID;
-import static frc.robot.Constants.HopperConstants.kLowerSensorDIO;
 import static frc.robot.Constants.HopperConstants.kUpperSensorDIO;
 
 import java.util.LinkedList;
@@ -20,34 +19,63 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.hopper.IntakeHopper;
-import frc.robot.commands.hopper.SaveCargoHigh;
-import frc.robot.commands.hopper.EjectCargo;
+
+/*
+While intake button pressed:
+
+	If cargo in front of color sensor:
+
+		Cargo present:
+			Stop intakeing hopper command
+
+			If cargo correct color
+
+				Correct color:
+
+					If no ball in the top of the hopper
+
+						No ball in top: Load until the beam break triggers
+
+						Ball in top: Disable intaking
+
+				Incorrect color: Outtake
+
+		No cargo present:
+
+			If operation already running
+
+				Not running: Enable hopper intake mode
+
+				Running: Do nothing	
+*/
 
 public class Hopper extends SubsystemBase {
-	private final TalonSRX hopperFront = new TalonSRX(kFrontHopperID);
-	private final TalonSRX hopperBack = new TalonSRX(kBackHopperID);
+	private final TalonSRX frontMotor = new TalonSRX(kFrontHopperID);
+	private final TalonSRX backMotor = new TalonSRX(kBackHopperID);
 	private final ColorSensorV3 colorSensor = new ColorSensorV3(Port.kOnboard);
 	private final DigitalInput upperSensor = new DigitalInput(kUpperSensorDIO);
-	private final DigitalInput lowerSensor = new DigitalInput(kLowerSensorDIO);
 
 	private HopperSetting currentState = HopperSetting.IDLE;
 	private Alliance alliance = Alliance.Invalid;
-	private int currentBallCount;
 
-	private double speed;
-	private double backSpeed;
+	private boolean autoEnabled = true;
 
-	private boolean autoEnabled = false;
-
-	private IntakeHopper intakeCommand;
-	// private SetHopper intakeCommand;
-
-	// Different
 	public enum HopperSetting {
-		LOAD,
-		OUTTAKE,
-		IDLE;
+		LOAD(0.25, 0.25),
+		INTAKE(0.19, -0.19),
+		UNLOAD(-0.25, -0.25),
+		HOLD(0.25, -0.25),
+		OUTTAKE(0.4, -0.4),
+		REVERSE(-0.1, -0.1),
+		IDLE(0, 0);
+
+		private double frontSpeed;
+		private double backSpeed;
+
+		private HopperSetting(double frontSpeed, double backSpeed) {
+			this.frontSpeed = frontSpeed;
+			this.backSpeed = backSpeed;
+		}
 	}
 
 	// The state of any cargo in the hopper
@@ -58,17 +86,15 @@ public class Hopper extends SubsystemBase {
 	}
 
 	public Hopper() {
-		hopperBack.setInverted(false);
-		hopperFront.setInverted(true);
-		intakeCommand = new IntakeHopper(this);
-		// intakeCommand = new SetHopper(this, HopperSetting.OUTTAKE, 0.19);
+		frontMotor.setInverted(true);
+		backMotor.setInverted(false);
+		frontMotor.setNeutralMode(NeutralMode.Brake);
+		backMotor.setNeutralMode(NeutralMode.Brake);
+
 		alliance = DriverStation.getAlliance();
 		autoEnabled = true;
-		hopperFront.setNeutralMode(NeutralMode.Brake);
-		hopperBack.setNeutralMode(NeutralMode.Brake);
 	}
 
-	private boolean newCargo = true;
 	private Queue<HopperCargoState> queue = new LinkedList<>();
 
 	public void setAutoControl(boolean enabled) {
@@ -79,47 +105,35 @@ public class Hopper extends SubsystemBase {
 		return autoEnabled;
 	}
 
+	private boolean newCargo = true;
+
 	@Override
 	public void periodic() {
-		applyState(currentState);
+		frontMotor.set(ControlMode.PercentOutput, currentState.frontSpeed);
+		backMotor.set(ControlMode.PercentOutput, currentState.backSpeed);
 
-		if (getUpperSensor() && getCargoState() == HopperCargoState.CORRECT && autoEnabled) {
-			intakeCommand.cancel();
-		}
-
-		if (getCargoState() != HopperCargoState.EMPTY && newCargo && autoEnabled) {
-			intakeCommand.cancel();
+		// If it's a new cargo and the hopper recives a cargo
+		if (newCargo && getCargoState() != HopperCargoState.EMPTY) {
+			// Mark the cargo as no longer being new
 			newCargo = false;
+			// Queue the new operation
 			queue.add(getCargoState());
 		}
 
 		newCargo = getCargoState() == HopperCargoState.EMPTY;
 
-		if (getCurrentCommand() == null) {
-			HopperCargoState operation = getQueuedOperation();
-			if (operation == HopperCargoState.CORRECT && !getUpperSensor()) {
-				new SaveCargoHigh(this).schedule(false);
-			} else if (operation == HopperCargoState.INCORRECT) {
-				new EjectCargo(this).schedule(false);
-			}
-		}
-
+		// System.out.println(currentState);
 		// System.out.println(queue);
-
-		// SmartDashboard.putBoolean("newCargo", newCargo);
-		SmartDashboard.putBoolean("upper sensor", getUpperSensor());
-		// SmartDashboard.putBoolean("lower sensor", getLowerSensor());
-		// SmartDashboard.putNumber("cargo count", getCargoCount());
-		SmartDashboard.putBoolean("hopper enabled", getAutoEnabled());
-		SmartDashboard.putBoolean("correct color", getCargoState() == HopperCargoState.CORRECT);
-		SmartDashboard.putString("state", getCargoState().toString());
-		SmartDashboard.putData(this);
+		// SmartDashboard.putBoolean("upper sensor", getCargoLoadedHigh());
+		// SmartDashboard.putBoolean("correct color", getCargoState() ==
+		// HopperCargoState.CORRECT);
+		// SmartDashboard.putString("state", getCargoState().toString());
+		// SmartDashboard.putData(this);
+		// SmartDashboard.putNumber("red", colorSensor.getRed());
+		// SmartDashboard.putNumber("blue", colorSensor.getBlue());
+		// SmartDashboard.putString("alliance", alliance.toString());
 		SmartDashboard.putBoolean("hopper enabled", autoEnabled);
 
-	}
-
-	public IntakeHopper getIntakeCommand() {
-		return intakeCommand;
 	}
 
 	public HopperCargoState getQueuedOperation() {
@@ -129,10 +143,8 @@ public class Hopper extends SubsystemBase {
 
 	}
 
-	public void setState(HopperSetting state, double speed, double backSpeed) {
+	public void setState(HopperSetting state) {
 		currentState = state;
-		this.speed = speed;
-		this.backSpeed = backSpeed;
 	}
 
 	public HopperCargoState getCargoState() {
@@ -153,52 +165,7 @@ public class Hopper extends SubsystemBase {
 		return HopperCargoState.INCORRECT;
 	}
 
-	public boolean getUpperSensor() {
+	public boolean getCargoLoadedHigh() {
 		return !upperSensor.get();
-	}
-
-	public void setCargoCount(int newValue) {
-		currentBallCount = newValue;
-	}
-
-	public boolean getLowerSensor() {
-		return !lowerSensor.get();
-	}
-
-	public void addToCargoCount() {
-		if (currentBallCount < 2)
-			currentBallCount++;
-	}
-
-	public void subtractFromCargoCount() {
-		if (currentBallCount > 0)
-			currentBallCount -= 1;
-	}
-
-	public int getCargoCount() {
-		return currentBallCount;
-	}
-
-	private void applyState(HopperSetting state) {
-		switch (state) {
-			// Set both hopper motors to pull the ball upwards
-			case LOAD:
-				hopperFront.set(ControlMode.PercentOutput, speed);
-				hopperBack.set(ControlMode.PercentOutput, backSpeed);
-				break;
-
-			// Set the front motor upwards, and the back motor downwards to spin the top
-			// ball in place and eject any below it
-			case OUTTAKE:
-				hopperFront.set(ControlMode.PercentOutput, speed);
-				hopperBack.set(ControlMode.PercentOutput, -backSpeed);
-				break;
-
-			// Idle state, pause both motors
-			case IDLE:
-				hopperFront.neutralOutput();
-				hopperBack.neutralOutput();
-				break;
-		}
 	}
 }
