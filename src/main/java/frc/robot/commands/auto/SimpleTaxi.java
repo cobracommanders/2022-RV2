@@ -25,21 +25,26 @@ public class SimpleTaxi extends SequentialCommandGroup {
 						new SequentialCommandGroup(
 								new CalibrateHood(hood),
 								new ResetGyro(drivetrain),
-								new SetShooter(shooter, ShooterSetting.TARMAC.RPM),
-								new SetHood(hood, ShooterSetting.TARMAC.angle)),
+								new SetShooter(shooter, ShooterSetting.FENDER),
+								new SetHood(hood, ShooterSetting.FENDER.angle)),
 						// Shoot
 						new SequentialCommandGroup(
 								new WaitCommand(SmartDashboard.getNumber("Auto Shoot Delay", 4)),
+								new SetHopper(hopper, HopperSetting.LOAD),
+								new WaitCommand(0.5),
+								new SetHopper(hopper, HopperSetting.IDLE),
+								new WaitCommand(1),
 								new SetHopper(hopper, HopperSetting.LOAD)),
 
 						// Drive
 						new SequentialCommandGroup(
-								new WaitCommand(SmartDashboard.getNumber("Auto Drive Delay", 8)),
+								//new WaitCommand(SmartDashboard.getNumber("Auto Drive Delay", 8)),
+								new WaitCommand(12),
 								new SetDrivetrain(drivetrain, -2, 0, 0),
 								new WaitCommand(1.5),
 								new SetDrivetrain(drivetrain, 0, 0, 0))),
 
 				new SetHopper(hopper, HopperSetting.IDLE),
-				new SetShooter(shooter, ShooterSetting.IDLE.RPM));
+				new SetShooter(shooter, ShooterSetting.IDLE));
 	}
 }

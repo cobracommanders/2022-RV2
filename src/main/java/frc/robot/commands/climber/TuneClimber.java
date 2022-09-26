@@ -5,29 +5,26 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Climber;
 
-public class SetClimber extends CommandBase {
+public class TuneClimber extends CommandBase {
 
 	private final Climber climber;
 	private DoubleSupplier left;
+	private DoubleSupplier right;
 
-	public SetClimber(Climber climber, DoubleSupplier speed) {
+	public TuneClimber(Climber climber, DoubleSupplier left, DoubleSupplier right) {
 		this.climber = climber;
-		this.left = speed;
+		this.left = left;
+		this.right = right;
 		addRequirements(this.climber);
 	}
 
 	@Override
 	public void execute() {
-		double left = deadzone(this.left.getAsDouble(), 0.3);
+		double left = deadzone(this.left.getAsDouble(), 0.2);
+		double right = deadzone(this.right.getAsDouble(), 0.2);
 
-		climber.setSpeedLeft(left);
-		climber.setSpeedRight(left);
-	}
-
-	@Override
-	public void end(boolean interrupted) {
-		climber.setSpeedLeft(0);
-		climber.setSpeedRight(0);
+		climber.setSpeedLeft(left / 4);
+		climber.setSpeedRight(right / 4);
 	}
 
 	private double deadzone(double input, double deadzone) {

@@ -3,6 +3,7 @@ package frc.robot.commands.hopper;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.subsystems.Hopper;
+import frc.robot.subsystems.Hopper.HopperCargoState;
 import frc.robot.subsystems.Hopper.HopperSetting;
 import frc.robot.subsystems.Shooter;
 
@@ -41,7 +42,8 @@ public class IntakeHopper extends CommandBase {
 				break;
 
 			case EMPTY:
-				intakeCommand.schedule(true);
+				if (hopper.getCargoState() != HopperCargoState.CORRECT)
+					intakeCommand.schedule(true);
 				break;
 		}
 	}

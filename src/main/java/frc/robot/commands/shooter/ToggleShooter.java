@@ -6,11 +6,11 @@ import frc.robot.subsystems.Shooter.ShooterSetting;
 
 public class ToggleShooter extends CommandBase {
 	private final Shooter shooter;
-	private final double speed;
+	private final ShooterSetting setting;
 
-	public ToggleShooter(Shooter shooter, double state) {
+	public ToggleShooter(Shooter shooter, ShooterSetting setting) {
 		this.shooter = shooter;
-		this.speed = state;
+		this.setting = setting;
 		addRequirements(this.shooter);
 
 	}
@@ -22,11 +22,11 @@ public class ToggleShooter extends CommandBase {
 
 	@Override
 	public void initialize() {
-		shooter.setSpeed(speed);
+		shooter.set(setting);
 	}
 
 	@Override
 	public void end(boolean interrupted) {
-		shooter.setSpeed(ShooterSetting.IDLE.RPM);
+		shooter.set(ShooterSetting.IDLE);
 	}
 }

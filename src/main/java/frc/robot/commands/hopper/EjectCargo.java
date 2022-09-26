@@ -14,10 +14,10 @@ public class EjectCargo extends SequentialCommandGroup {
 		addCommands(
 				new SetHopper(hopper, HopperSetting.OUTTAKE),
 				new WaitCommand(1),
-				new SetShooter(shooter, ShooterSetting.REVERSE.RPM),
+				new SetShooter(shooter, ShooterSetting.REVERSE),
 				new SetHopper(hopper, HopperSetting.REVERSE),
 				new WaitCommand(0.3),
 				new SetHopper(hopper, HopperSetting.IDLE),
-				new SetShooter(shooter, ShooterSetting.IDLE.RPM));
+				new SetShooter(shooter, ShooterSetting.IDLE));
 	}
 }

@@ -56,9 +56,9 @@ public class Hopper extends SubsystemBase {
 	private final DigitalInput upperSensor = new DigitalInput(kUpperSensorDIO);
 
 	private HopperSetting currentState = HopperSetting.IDLE;
-	private Alliance alliance = Alliance.Invalid;
+	private static Alliance alliance = Alliance.Invalid;
 
-	private boolean autoEnabled = true;
+	private boolean autoEnabled;
 
 	public enum HopperSetting {
 		LOAD(0.25, 0.25),
@@ -67,6 +67,7 @@ public class Hopper extends SubsystemBase {
 		HOLD(0.25, -0.25),
 		OUTTAKE(0.4, -0.4),
 		REVERSE(-0.1, -0.1),
+		OUTTAKETOP(-0.4, -0.4),
 		IDLE(0, 0);
 
 		private double frontSpeed;
@@ -92,7 +93,12 @@ public class Hopper extends SubsystemBase {
 		backMotor.setNeutralMode(NeutralMode.Brake);
 
 		alliance = DriverStation.getAlliance();
+
 		autoEnabled = true;
+	}
+
+	public static void updateAlliance() {
+		alliance = DriverStation.getAlliance();
 	}
 
 	private Queue<HopperCargoState> queue = new LinkedList<>();
@@ -127,10 +133,10 @@ public class Hopper extends SubsystemBase {
 		// SmartDashboard.putBoolean("upper sensor", getCargoLoadedHigh());
 		// SmartDashboard.putBoolean("correct color", getCargoState() ==
 		// HopperCargoState.CORRECT);
-		// SmartDashboard.putString("state", getCargoState().toString());
-		// SmartDashboard.putData(this);
-		// SmartDashboard.putNumber("red", colorSensor.getRed());
-		// SmartDashboard.putNumber("blue", colorSensor.getBlue());
+		SmartDashboard.putString("state", getCargoState().toString());
+		SmartDashboard.putData(this);
+		SmartDashboard.putNumber("red", colorSensor.getRed());
+		SmartDashboard.putNumber("blue", colorSensor.getBlue());
 		// SmartDashboard.putString("alliance", alliance.toString());
 		SmartDashboard.putBoolean("hopper enabled", autoEnabled);
 

@@ -17,9 +17,8 @@ import frc.robot.commands.ResetGyro;
 import frc.robot.commands.RumbleController;
 import frc.robot.commands.auto.SimpleTaxi;
 import frc.robot.commands.centerer.SetCenterer;
-import frc.robot.commands.climber.RaiseClimber;
 import frc.robot.commands.climber.SetClimber;
-import frc.robot.commands.climber.ZeroClimber;
+import frc.robot.commands.climber.TuneClimber;
 import frc.robot.commands.drivetrain.FieldOrientedDrive;
 import frc.robot.commands.drivetrain.RobotOrientedDrive;
 import frc.robot.commands.hood.CalibrateHood;
@@ -30,6 +29,7 @@ import frc.robot.commands.hopper.ToggleAutoHopper;
 import frc.robot.commands.hopper.ToggleHopper;
 import frc.robot.commands.intake.SetIntake;
 import frc.robot.commands.shooter.SetShooter;
+import frc.robot.commands.shooter.ToggleShooter;
 import frc.robot.commands.wrist.SetWrist;
 import frc.robot.subsystems.Centerer;
 import frc.robot.subsystems.Centerer.CentererState;
@@ -66,8 +66,12 @@ public class RobotContainer {
 		return driverController.getRawAxis(Axis.kLeftTrigger.value) > 0.3;
 	});
 
-	private final Trigger climberTuneMode = new Trigger(() -> {
+	private final Trigger climberUp = new Trigger(() -> {
 		return operatorController.getRawAxis(Axis.kRightTrigger.value) > 0.3;
+	});
+
+	private final Trigger climberDown = new Trigger(() -> {
+		return operatorController.getRawAxis(Axis.kLeftTrigger.value) > 0.3;
 	});
 
 	private final Trigger flywheelAtSpeed = new Trigger(() -> {
@@ -92,13 +96,6 @@ public class RobotContainer {
 						0.1,
 						// Slow speed
 						() -> driverController.getRawButton(Button.kLeftBumper.value)));
-
-		climber.setDefaultCommand(
-				new SetClimber(
-						climber,
-						() -> -operatorController.getRawAxis(Axis.kLeftY.value),
-						() -> -operatorController.getRawAxis(Axis.kRightY.value),
-						climberTuneMode));
 	}
 
 	private void configureButtonBindings() {
@@ -138,7 +135,7 @@ public class RobotContainer {
 				// When the button is released put the wrist in
 				.whenInactive(new SetWrist(wrist, WristState.IN))
 				// If automatic sorting is disabled, set the hopper manually
-				.and(hopperEnabled.negate()).whileActiveOnce(new SetHopper(hopper, HopperSetting.LOAD));
+				.and(hopperEnabled.negate()).whileActiveOnce(new ToggleHopper(hopper, HopperSetting.LOAD));
 
 		outtakeFrontButton
 				// While the button is pressed
@@ -153,7 +150,9 @@ public class RobotContainer {
 				// When the button is released put the wrist in
 				.whenInactive(new SetWrist(wrist, WristState.IN))
 				// When automatic sorting is disabled set the hopper to unload cargo as well
-				.and(hopperEnabled.negate()).whileActiveOnce(new SetHopper(hopper, HopperSetting.UNLOAD));
+				.and(hopperEnabled.negate()).whileActiveOnce(new ParallelCommandGroup(
+						new ToggleHopper(hopper, HopperSetting.OUTTAKETOP),
+						new ToggleShooter(shooter, ShooterSetting.REVERSE)));
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
 				.and(flywheelAtSpeed)
@@ -163,29 +162,41 @@ public class RobotContainer {
 				.whenPressed(new ToggleAutoHopper(hopper));
 
 		new JoystickButton(operatorController, Button.kY.value)
-				.whenPressed(new SetShooter(shooter, ShooterSetting.LAUNCHPAD.RPM))
+				.whenPressed(new SetShooter(shooter, ShooterSetting.LAUNCHPAD))
 				.whenPressed(new SetHood(hood, ShooterSetting.LAUNCHPAD.angle));
 
 		new JoystickButton(operatorController, Button.kB.value)
-				.whenPressed(new SetShooter(shooter, ShooterSetting.TARMAC.RPM))
+				.whenPressed(new SetShooter(shooter, ShooterSetting.TARMAC))
 				.whenPressed(new SetHood(hood, ShooterSetting.TARMAC.angle));
 
 		new JoystickButton(operatorController, Button.kA.value)
-				.whenPressed(new SetShooter(shooter, ShooterSetting.FENDER.RPM))
+				.whenPressed(new SetShooter(shooter, ShooterSetting.FENDER))
 				.whenPressed(new SetHood(hood, ShooterSetting.FENDER.angle));
 
 		new JoystickButton(operatorController, Button.kX.value)
-				.whenPressed(new SetShooter(shooter, ShooterSetting.IDLE.RPM));
+				.whenPressed(new SetShooter(shooter, ShooterSetting.IDLE));
 
 		new JoystickButton(operatorController, Button.kRightBumper.value)
 				.whenPressed(new CalibrateHood(hood));
 
-		new JoystickButton(operatorController, Button.kBack.value).whenPressed(new RaiseClimber(climber));
-		new JoystickButton(operatorController, Button.kStart.value).whenPressed(new ZeroClimber(climber));
+		new JoystickButton(operatorController, Button.kStart.value).toggleWhenPressed(
+				new TuneClimber(
+						climber,
+						() -> -operatorController.getRawAxis(Axis.kLeftY.value),
+						() -> -operatorController.getRawAxis(Axis.kRightY.value)));
+
+		climberUp.whileActiveOnce(new SetClimber(climber, () -> operatorController.getRawAxis(Axis.kRightTrigger.value)));
+		climberDown.whileActiveOnce(new SetClimber(climber, () -> -operatorController.getRawAxis(Axis.kLeftTrigger.value)));
+
+		// new JoystickButton(operatorController, Button.kBack.value).whenPressed(new
+		// RaiseClimber(climber));
+		// new JoystickButton(operatorController, Button.kStart.value).whenPressed(new
+		// ZeroClimber(climber));
 
 		// new JoystickButton(driverController, Button.kStart.value)
-		// .whenPressed(new InstantCommand(() ->
-		// shooter.setSpeed(SmartDashboard.getNumber("Shooter RPM", 0))));
+		// .whileHeld(new ToggleShooter(shooter, SmartDashboard.getNumber("Shooter RPM",
+		// 0)));
+
 		// new JoystickButton(driverController, Button.kBack.value)
 		// .whenPressed(new InstantCommand(() ->
 		// hood.setAngle(SmartDashboard.getNumber("Hood Angle", 0))));
