@@ -21,7 +21,8 @@ public class Shooter extends SubsystemBase {
 	private ShooterSetting currentSetting = ShooterSetting.IDLE;
 
 	public enum ShooterSetting {
-		FENDER(2000, 0.1),
+		//FENDER(2000, 0.1),
+		FENDER(500, 0.5),
 		TARMAC(6800, 0.4),
 		LAUNCHPAD(8400, 1.4),
 		REVERSE(-3000, 0),

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -16,7 +17,7 @@ import frc.robot.commands.CalibrateGyro;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.RumbleController;
 import frc.robot.commands.auto.SimpleTaxi;
-import frc.robot.commands.centerer.SetCenterer;
+import frc.robot.commands.centerer.ToggleCenterer;
 import frc.robot.commands.climber.SetClimber;
 import frc.robot.commands.climber.TuneClimber;
 import frc.robot.commands.drivetrain.FieldOrientedDrive;
@@ -24,10 +25,9 @@ import frc.robot.commands.drivetrain.RobotOrientedDrive;
 import frc.robot.commands.hood.CalibrateHood;
 import frc.robot.commands.hood.SetHood;
 import frc.robot.commands.hopper.IntakeHopper;
-import frc.robot.commands.hopper.SetHopper;
 import frc.robot.commands.hopper.ToggleAutoHopper;
 import frc.robot.commands.hopper.ToggleHopper;
-import frc.robot.commands.intake.SetIntake;
+import frc.robot.commands.intake.ToggleIntake;
 import frc.robot.commands.shooter.SetShooter;
 import frc.robot.commands.shooter.ToggleShooter;
 import frc.robot.commands.wrist.SetWrist;
@@ -120,31 +120,33 @@ public class RobotContainer {
 				.whileActiveContinuous(
 						new ParallelCommandGroup(
 								// Start the intake
-								new SetIntake(intake, IntakeState.INTAKE),
+								new ToggleIntake(intake, IntakeState.INTAKE),
 								// Start the centerers
-								new SetCenterer(centerer, CentererState.CENTER),
+								// new ToggleCenterer(centerer, CentererState.CENTER),
+								// Now part of the intakeHopper command
+
 								// Start the hopper
 								new SelectCommand(
 										() -> hopper.getAutoEnabled()
 												// If automatic sorting is enabled, run the automatic intake command
-												? new IntakeHopper(hopper, shooter)
-												// If not, just turn on the hopper
-												: new SetHopper(hopper, HopperSetting.LOAD))))
+												? new IntakeHopper(hopper, shooter, centerer)
+												// If not, just turn on the hopper and centerer manually
+												: new ParallelCommandGroup(
+														new ToggleHopper(hopper, HopperSetting.LOAD),
+														new ToggleCenterer(centerer, CentererState.CENTER)))))
 				// When the button is first pressed put the wrist out
 				.whenActive(new SetWrist(wrist, WristState.OUT))
 				// When the button is released put the wrist in
-				.whenInactive(new SetWrist(wrist, WristState.IN))
-				// If automatic sorting is disabled, set the hopper manually
-				.and(hopperEnabled.negate()).whileActiveOnce(new ToggleHopper(hopper, HopperSetting.LOAD));
+				.whenInactive(new SetWrist(wrist, WristState.IN));
 
 		outtakeFrontButton
 				// While the button is pressed
 				.whileActiveOnce(
 						new ParallelCommandGroup(
 								// Reverse the intake
-								new SetIntake(intake, IntakeState.OUTTAKE),
+								new ToggleIntake(intake, IntakeState.OUTTAKE),
 								// Reverse the centerers
-								new SetCenterer(centerer, CentererState.OUTTAKE)))
+								new ToggleCenterer(centerer, CentererState.OUTTAKE)))
 				// When the button is first pressed put the wrist out
 				.whenActive(new SetWrist(wrist, WristState.OUT))
 				// When the button is released put the wrist in
@@ -183,23 +185,18 @@ public class RobotContainer {
 				new TuneClimber(
 						climber,
 						() -> -operatorController.getRawAxis(Axis.kLeftY.value),
-						() -> -operatorController.getRawAxis(Axis.kRightY.value)));
+						() -> -operatorController.getRawAxis(Axis.kRightY.value)),
+				false);
 
-		climberUp.whileActiveOnce(new SetClimber(climber, () -> operatorController.getRawAxis(Axis.kRightTrigger.value)));
-		climberDown.whileActiveOnce(new SetClimber(climber, () -> -operatorController.getRawAxis(Axis.kLeftTrigger.value)));
+		climberUp.whileActiveOnce(
+				new SetClimber(climber, () -> operatorController.getRawAxis(Axis.kRightTrigger.value)))
+				.whenActive(new InstantCommand(() -> Robot.logger.log("Climber up button pressed")))
+				.whenInactive(new InstantCommand(() -> Robot.logger.log("Climber up button released")));
 
-		// new JoystickButton(operatorController, Button.kBack.value).whenPressed(new
-		// RaiseClimber(climber));
-		// new JoystickButton(operatorController, Button.kStart.value).whenPressed(new
-		// ZeroClimber(climber));
-
-		// new JoystickButton(driverController, Button.kStart.value)
-		// .whileHeld(new ToggleShooter(shooter, SmartDashboard.getNumber("Shooter RPM",
-		// 0)));
-
-		// new JoystickButton(driverController, Button.kBack.value)
-		// .whenPressed(new InstantCommand(() ->
-		// hood.setAngle(SmartDashboard.getNumber("Hood Angle", 0))));
+		climberDown.whileActiveOnce(
+				new SetClimber(climber, () -> -operatorController.getRawAxis(Axis.kLeftTrigger.value)))
+				.whenActive(new InstantCommand(() -> Robot.logger.log("Climber down button pressed")))
+				.whenInactive(new InstantCommand(() -> Robot.logger.log("Climber down button released")));
 
 		flywheelAtSpeed.whileActiveOnce(new RumbleController(driverController, 0.2));
 	}

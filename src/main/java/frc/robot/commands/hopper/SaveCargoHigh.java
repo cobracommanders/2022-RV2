@@ -12,9 +12,9 @@ public class SaveCargoHigh extends SequentialCommandGroup {
 		addRequirements(hopper);
 		addCommands(
 				new SetHopper(hopper, HopperSetting.LOAD),
-				new WaitUntilCommand(() -> hopper.getCargoLoadedHigh()),
+				new WaitUntilCommand(() -> hopper.getUpperSensor()),
 				new SetHopper(hopper, HopperSetting.REVERSE),
-				new WaitCommand(0.2),
+				new WaitCommand(0.3),
 				new SetHopper(hopper, HopperSetting.IDLE));
 	}
 }

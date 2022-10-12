@@ -39,8 +39,13 @@
 # Compiled class file
 *.class
 
-# Log file
+# Log files
 *.log
+
+# Custom log file for the robot
+*.rlog
+# Log file directory
+\logs
 
 # BlueJ files
 *.ctxt

@@ -24,7 +24,7 @@ public final class Constants {
 	public static final class IntakeConstants {
 		public static final int kIntakeID = 30;
 
-		public static final double kIntakeSpeed = 0.75;
+		public static final double kIntakeSpeed = 0.85;
 	}
 
 	public static final class CentererConstants {
