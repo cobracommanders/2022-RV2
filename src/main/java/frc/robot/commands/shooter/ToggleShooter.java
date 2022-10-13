@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterSetting;
 
+// Sets the shooter to a given state, then sets it to idle when the command ends
 public class ToggleShooter extends CommandBase {
 	private final Shooter shooter;
 	private final ShooterSetting setting;
@@ -12,7 +13,6 @@ public class ToggleShooter extends CommandBase {
 		this.shooter = shooter;
 		this.setting = setting;
 		addRequirements(this.shooter);
-
 	}
 
 	@Override

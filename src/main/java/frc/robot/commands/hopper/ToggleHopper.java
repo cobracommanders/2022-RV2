@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Hopper.HopperSetting;
 
+// Sets the hopper to a given state, then sets it to idle when the command ends
 public class ToggleHopper extends CommandBase {
 	private final Hopper hopper;
 	private final HopperSetting state;

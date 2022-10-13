@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hood.ControlMode;
 
+// Lowers the hood until it triggers the limit switch, then set the encoder to zero
 public class CalibrateHood extends CommandBase {
 	private Hood hood;
 

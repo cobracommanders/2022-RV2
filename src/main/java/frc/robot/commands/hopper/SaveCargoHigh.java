@@ -6,8 +6,8 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Hopper.HopperSetting;
 
+// Brings a cargo to the top of the hopper
 public class SaveCargoHigh extends SequentialCommandGroup {
-
 	public SaveCargoHigh(Hopper hopper) {
 		addRequirements(hopper);
 		addCommands(

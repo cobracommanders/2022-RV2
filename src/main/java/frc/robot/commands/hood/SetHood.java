@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Hood.ControlMode;
 
+// Sets the hood to a given position
 public class SetHood extends InstantCommand {
 	private Hood hood;
 	private double angle;

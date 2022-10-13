@@ -17,8 +17,9 @@ import frc.robot.subsystems.Hopper.HopperSetting;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterSetting;
 
-public class SimpleTaxi extends SequentialCommandGroup {
-	public SimpleTaxi(Drivetrain drivetrain, Hood hood, Shooter shooter, Hopper hopper) {
+// Scores two cargo in the upper hub from the fender (only at chezy champs)
+public class ChezyTwoBall extends SequentialCommandGroup {
+	public ChezyTwoBall(Drivetrain drivetrain, Hood hood, Shooter shooter, Hopper hopper) {
 		addCommands(
 				new ParallelCommandGroup(
 						// Setup

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Wrist.WristState;
 
+// Sets the wrist to a given state
 public class SetWrist extends CommandBase {
 	private Wrist wrist;
 	private WristState state;

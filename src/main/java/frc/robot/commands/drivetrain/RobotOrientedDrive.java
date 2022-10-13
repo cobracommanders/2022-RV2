@@ -7,6 +7,7 @@ import frc.robot.subsystems.Drivetrain;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+// Controls the drivetrain in robot oriented mode
 public class RobotOrientedDrive extends CommandBase {
 	private final Drivetrain drivetrainSubsystem;
 

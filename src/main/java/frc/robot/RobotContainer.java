@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CalibrateGyro;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.RumbleController;
-import frc.robot.commands.auto.SimpleTaxi;
+import frc.robot.commands.auto.ChezyTwoBall;
 import frc.robot.commands.centerer.ToggleCenterer;
 import frc.robot.commands.climber.SetClimber;
 import frc.robot.commands.climber.TuneClimber;
@@ -202,7 +202,7 @@ public class RobotContainer {
 	}
 
 	public Command getAutoCommand() {
-		return new SimpleTaxi(drivetrain, hood, shooter, hopper);
+		return new ChezyTwoBall(drivetrain, hood, shooter, hopper);
 	}
 
 	public Command getRobotInitCommand() {

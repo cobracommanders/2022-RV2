@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.Climber;
 
+// Sets the climber to a given speed
 public class SetClimber extends CommandBase {
 
 	private final Climber climber;

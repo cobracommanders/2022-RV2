@@ -5,6 +5,7 @@ import frc.robot.Robot;
 import frc.robot.subsystems.Centerer;
 import frc.robot.subsystems.Centerer.CentererState;
 
+// Sets the centerer to a given state, then sets it to idle when the command ends
 public class ToggleCenterer extends CommandBase {
 	private final Centerer centerer;
 	private final CentererState state;

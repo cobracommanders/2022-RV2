@@ -3,15 +3,14 @@ package frc.robot.commands.hopper;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.centerer.ToggleCenterer;
 import frc.robot.subsystems.Centerer;
+import frc.robot.subsystems.Centerer.CentererState;
 import frc.robot.subsystems.Hopper;
-import frc.robot.subsystems.Hopper.HopperCargoState;
 import frc.robot.subsystems.Hopper.HopperSetting;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Centerer.CentererState;
 
+// This is run while the intake button is held, it sets the hopper motors based on instruction from the hopper class
 public class IntakeHopper extends CommandBase {
 	private Hopper hopper;
 	private Shooter shooter;
@@ -29,39 +28,24 @@ public class IntakeHopper extends CommandBase {
 	}
 
 	@Override
-	public void initialize() {
-	}
-
-	@Override
 	public void execute() {
-			switch (hopper.getQueuedOperation()) {
-				case CORRECT:
-					if (!hopper.getUpperSensor())
-						hopper.getLowerSensorTrigger().cancelWhenActive(
-								new SaveCargoHigh(hopper));
-					else {
-						// intakeCommand.cancel();
-						// intakeCommand.end(true);
-						// new SaveCargoLow(hopper).schedule(false);
-						intakeCommand.cancel();
-						intakeCommand.end(true);
-					}
-					break;
+		switch (hopper.getOperation()) {
+			case CORRECT:
+				new SaveCargoHigh(hopper).schedule(false);
+				break;
 
-				case INCORRECT:
-					new EjectCargo(hopper, shooter).schedule(false);
-					break;
+			case INCORRECT:
+				new EjectCargo(hopper, shooter).schedule(false);
+				break;
 
-				case EMPTY:
-					if (!hopper.hopperFull())
-						intakeCommand.schedule(true);
-					// else
-					// intakeCommand.cancel();
-					// intakeCommand.end(true);
-					break;
+			case IDLE:
+				intakeCommand.cancel();
+				break;
+
+			case EMPTY:
+				intakeCommand.schedule(true);
+				break;
 		}
-		intakeCommand.cancel();
-		intakeCommand.end(true);
 	}
 
 	@Override

@@ -6,7 +6,9 @@ public final class Constants {
 		public static final int kBackHopperID = 21;
 
 		public static final double kColorSensorLeniency = 200;
+
 		public static final int kUpperSensorDIO = 0;
+		public static final int kLowerSensorDIO = 8;
 	}
 
 	public static final class ShooterConstants {
@@ -53,8 +55,6 @@ public final class Constants {
 		 */
 		public static final double kDrivetrainWheelbaseMeters = 0.5461;
 
-		// public static final int kPigeonID = 0;
-
 		public static final int kFrontLeftModuleDriveID = 3;
 		public static final int kFrontLeftModuleSteerID = 4;
 		public static final int kFrontLeftModuleEncoderID = 12;
@@ -74,6 +74,5 @@ public final class Constants {
 		public static final int kBackRightModuleSteerID = 8;
 		public static final int kBackRightModuleEncoderID = 14;
 		public static final double kBackRightModuleOffset = -Math.toRadians(28.0);
-
 	}
 }

@@ -8,6 +8,7 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Hopper.HopperSetting;
 import frc.robot.subsystems.Shooter.ShooterSetting;
 
+// Eject a cargo from the front of the hopper
 public class EjectCargo extends SequentialCommandGroup {
 	public EjectCargo(Hopper hopper, Shooter shooter) {
 		addRequirements(hopper);

@@ -5,6 +5,7 @@ import frc.robot.Robot;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 
+// Sets the intake to a given state, then sets it to idle when the command ends
 public class ToggleIntake extends CommandBase {
 	private final Intake intake;
 	private final IntakeState state;

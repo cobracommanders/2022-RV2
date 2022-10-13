@@ -21,8 +21,8 @@ public class Shooter extends SubsystemBase {
 	private ShooterSetting currentSetting = ShooterSetting.IDLE;
 
 	public enum ShooterSetting {
-		//FENDER(2000, 0.1),
-		FENDER(500, 0.5),
+		FENDER(2000, 0.1),
+		// FENDER(500, 0.5), // Demo mode, this barely spits out the ball
 		TARMAC(6800, 0.4),
 		LAUNCHPAD(8400, 1.4),
 		REVERSE(-3000, 0),
@@ -70,9 +70,6 @@ public class Shooter extends SubsystemBase {
 		} else {
 			leftMotor.neutralOutput();
 		}
-
-		// leftMotor.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Shooter
-		// RPM", 0));
 
 		SmartDashboard.putNumber("Actual RPM", leftMotor.getSelectedSensorVelocity() * 0.29296875);
 		SmartDashboard.putNumber("voltage used", leftMotor.getMotorOutputVoltage());

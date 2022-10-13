@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Hopper.HopperSetting;
 
+// Sets the hopper to a given state
 public class SetHopper extends InstantCommand {
 	private final Hopper hopper;
 	private final HopperSetting state;
