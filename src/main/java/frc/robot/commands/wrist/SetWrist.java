@@ -4,11 +4,12 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Wrist.WristState;
 
-public class WristControl extends CommandBase {
+// Sets the wrist to a given state
+public class SetWrist extends CommandBase {
 	private Wrist wrist;
 	private WristState state;
 
-	public WristControl(Wrist wrist, WristState state) {
+	public SetWrist(Wrist wrist, WristState state) {
 		this.wrist = wrist;
 		this.state = state;
 		addRequirements(this.wrist);
@@ -17,10 +18,5 @@ public class WristControl extends CommandBase {
 	@Override
 	public void initialize() {
 		wrist.setState(state);
-	}
-
-	@Override
-	public boolean isFinished() {
-		return true;
 	}
 }

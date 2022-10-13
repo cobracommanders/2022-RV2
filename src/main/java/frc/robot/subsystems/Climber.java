@@ -8,7 +8,7 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Climbers extends SubsystemBase {
+public class Climber extends SubsystemBase {
 	private final CANSparkMax leftClimber = new CANSparkMax(32, MotorType.kBrushless);
 	private final CANSparkMax rightClimber = new CANSparkMax(35, MotorType.kBrushless);
 	private final RelativeEncoder leftEncoder = leftClimber.getEncoder();
@@ -16,21 +16,18 @@ public class Climbers extends SubsystemBase {
 	private double leftSpeed;
 	private double rightSpeed;
 
-	public Climbers() {
+	public Climber() {
 		leftClimber.setIdleMode(IdleMode.kBrake);
 		rightClimber.setIdleMode(IdleMode.kBrake);
 		leftClimber.setInverted(false);
 		rightClimber.setInverted(true);
+		//rightClimber.follow(leftClimber, true);
 	}
 
 	@Override
 	public void periodic() {
-		// if (!pidEnabled) {
 		leftClimber.set(-leftSpeed);
 		rightClimber.set(-rightSpeed);
-		// }
-		// leftClimber.set(PID.calculate(leftEncoder.getPosition(), setpoint));
-		// rightClimber.set(PID.calculate(rightEncoder.getPosition(), setpoint));
 
 		SmartDashboard.putNumber("climber encoder", leftEncoder.getPosition());
 	}

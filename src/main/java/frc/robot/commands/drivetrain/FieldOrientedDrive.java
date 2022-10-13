@@ -8,6 +8,7 @@ import frc.robot.subsystems.Drivetrain;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
+// Controls the robot in fiels oriented mode
 public class FieldOrientedDrive extends CommandBase {
 	private final Drivetrain drivetrainSubsystem;
 

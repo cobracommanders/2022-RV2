@@ -1,14 +1,16 @@
 package frc.robot.commands.centerer;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.Centerer;
 import frc.robot.subsystems.Centerer.CentererState;
 
-public class CentererControl extends CommandBase {
+// Sets the centerer to a given state, then sets it to idle when the command ends
+public class ToggleCenterer extends CommandBase {
 	private final Centerer centerer;
 	private final CentererState state;
 
-	public CentererControl(Centerer centerer, CentererState state) {
+	public ToggleCenterer(Centerer centerer, CentererState state) {
 		this.centerer = centerer;
 		this.state = state;
 		addRequirements(this.centerer);
@@ -17,19 +19,12 @@ public class CentererControl extends CommandBase {
 	@Override
 	public void initialize() {
 		centerer.setState(state);
-	}
-
-	@Override
-	public void execute() {
+		centerer.getCounter().add();
+		Robot.logger.log("Set centerer");
 	}
 
 	@Override
 	public void end(boolean interrupted) {
 		centerer.setState(CentererState.IDLE);
-	}
-
-	@Override
-	public boolean isFinished() {
-		return false;
 	}
 }
