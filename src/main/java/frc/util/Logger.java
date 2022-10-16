@@ -1,28 +1,28 @@
 package frc.util;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Calendar;
+// import java.io.File;
+// import java.io.FileWriter;
+// import java.io.IOException;
+// import java.util.Calendar;
 
-import frc.robot.Robot;
+// import frc.robot.Robot;
 
 public class Logger {
-	private FileWriter writer;
-	private File file;
-	private File directory;
-	private String name;
-	private String saveFilePath;
-	private Settings settings;
+	// private FileWriter writer;
+	// private File file;
+	// private File directory;
+	// private String name;
+	// private String saveFilePath;
+	// private Settings settings;
 
-	private File renameFile;
+	// private File renameFile;
 
 	// General save path for the rio: /home/lvuser/
 
 	// SFTP rio address: roborio-498-frc.local
 	// SFTP rio port: 22
 
-	private final String fileExtention = ".rlog";
+	//private final String fileExtention = ".rlog";
 
 	public Logger(String name) {
 		/*
@@ -100,18 +100,18 @@ public class Logger {
 
 	// Returns the time in this format:
 	// HH:MM:SS:MMM
-	private String getTime() {
-		Calendar calendar = Calendar.getInstance();
-		int hour = calendar.get(Calendar.HOUR_OF_DAY);
-		int minute = calendar.get(Calendar.MINUTE);
-		int second = calendar.get(Calendar.SECOND);
-		int millisecond = calendar.get(Calendar.MILLISECOND);
+	// private String getTime() {
+	// 	Calendar calendar = Calendar.getInstance();
+	// 	int hour = calendar.get(Calendar.HOUR_OF_DAY);
+	// 	int minute = calendar.get(Calendar.MINUTE);
+	// 	int second = calendar.get(Calendar.SECOND);
+	// 	int millisecond = calendar.get(Calendar.MILLISECOND);
 
-		return addZerosToLength(2, hour)
-				+ ":" + addZerosToLength(2, minute)
-				+ ":" + addZerosToLength(2, second)
-				+ ":" + addZerosToLength(3, millisecond);
-	}
+	// 	return addZerosToLength(2, hour)
+	// 			+ ":" + addZerosToLength(2, minute)
+	// 			+ ":" + addZerosToLength(2, second)
+	// 			+ ":" + addZerosToLength(3, millisecond);
+	// }
 
 	public void updateDate() {
 		/*
@@ -131,20 +131,20 @@ public class Logger {
 
 	// Returns the date in this format:
 	// DD-MM-YYYY
-	private String getDate() {
-		Calendar calendar = Calendar.getInstance();
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH) + 1;
-		int day = calendar.get(Calendar.DATE);
+	// private String getDate() {
+	// 	Calendar calendar = Calendar.getInstance();
+	// 	int year = calendar.get(Calendar.YEAR);
+	// 	int month = calendar.get(Calendar.MONTH) + 1;
+	// 	int day = calendar.get(Calendar.DATE);
 
-		return addZerosToLength(2, month)
-				+ "-" + addZerosToLength(2, day)
-				+ "-" + addZerosToLength(4, year);
-	}
+	// 	return addZerosToLength(2, month)
+	// 			+ "-" + addZerosToLength(2, day)
+	// 			+ "-" + addZerosToLength(4, year);
+	// }
 
 	// Takes an input and adds zeros to the end until it reaches a specified number
 	// of characters
-	private String addZerosToLength(int length, int input) {
-		return String.format("%1$" + length + "s", input).replace(' ', '0');
-	}
+	// private String addZerosToLength(int length, int input) {
+	// 	return String.format("%1$" + length + "s", input).replace(' ', '0');
+	// }
 }

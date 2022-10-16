@@ -10,6 +10,10 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.util.Limelight;
+import frc.util.LinearInterpolator;
+import static frc.robot.ShooterTable.hoodAngleTable;
+import static frc.robot.Constants.HoodConstants.kHoodLimitDIO;
 
 public class Hood extends SubsystemBase {
 	private final CANSparkMax motor;
@@ -18,8 +22,10 @@ public class Hood extends SubsystemBase {
 	private final DigitalInput limit;
 	// private final SparkMaxPIDController PID1;
 	private ControlMode currentControlMode = ControlMode.PID;
+	private final Limelight limelight;
+	private LinearInterpolator interpolator = new LinearInterpolator(hoodAngleTable);
 
-	public Hood() {
+	public Hood(Limelight limelight) {
 		motor = new CANSparkMax(36, MotorType.kBrushless);
 		motor.restoreFactoryDefaults();
 		encoder = motor.getEncoder();
@@ -27,8 +33,9 @@ public class Hood extends SubsystemBase {
 		encoder.setPosition(0);
 		PID = new PIDController(0.0075, 0, 0.0000005);
 		// PID.setTolerance(1);
-		limit = new DigitalInput(9);
+		limit = new DigitalInput(kHoodLimitDIO);
 		motor.setIdleMode(IdleMode.kBrake);
+		this.limelight = limelight;
 		// PID1 = motor.getPIDController();
 		// PID1.setP(0.0075);
 		// PID1.setI(0);
@@ -47,6 +54,10 @@ public class Hood extends SubsystemBase {
 	public enum ControlMode {
 		PID,
 		MANUAL
+	}
+
+	public double getInterpolatedValue() {
+		return interpolator.getInterpolatedValue(limelight.getDistance());
 	}
 
 	public void setAngle(double angle) {

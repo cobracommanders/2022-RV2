@@ -1,22 +1,26 @@
 package frc.robot.commands.shooter;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Shooter.ShooterSetting;
 
 // Sets the shooter to a given state
-public class SetShooter extends InstantCommand {
+public class SetShooter extends CommandBase {
 	private final Shooter shooter;
-	private final ShooterSetting setting;
+	private double speed;
 
-	public SetShooter(Shooter shooter, ShooterSetting setting) {
+	public SetShooter(Shooter shooter, double speed) {
 		this.shooter = shooter;
-		this.setting = setting;
+		this.speed = speed;
 		addRequirements(this.shooter);
 	}
 
 	@Override
-	public void initialize() {
-		shooter.set(setting);
+	public void execute() {
+		shooter.set(speed);
+	}
+
+	@Override
+	public void end(boolean interrupted) {
+		shooter.set(0);
 	}
 }

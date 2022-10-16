@@ -1,5 +1,6 @@
 package frc.robot.commands.hopper;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -8,6 +9,7 @@ import frc.robot.subsystems.Centerer;
 import frc.robot.subsystems.Centerer.CentererState;
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.Hopper.HopperSetting;
+import frc.robot.subsystems.Hopper.HopperState;
 import frc.robot.subsystems.Shooter;
 
 // This is run while the intake button is held, it sets the hopper motors based on instruction from the hopper class

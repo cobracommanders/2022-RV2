@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.Constants.OIConstants.kControllerRumbleRange;
 import static frc.robot.Constants.OIConstants.kDriverControllerID;
 import static frc.robot.Constants.OIConstants.kOperatorControllerID;
+import static frc.robot.Constants.LimelightConstants.*;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
@@ -23,13 +24,12 @@ import frc.robot.commands.climber.TuneClimber;
 import frc.robot.commands.drivetrain.FieldOrientedDrive;
 import frc.robot.commands.drivetrain.RobotOrientedDrive;
 import frc.robot.commands.hood.CalibrateHood;
-import frc.robot.commands.hood.SetHood;
 import frc.robot.commands.hopper.IntakeHopper;
 import frc.robot.commands.hopper.ToggleAutoHopper;
 import frc.robot.commands.hopper.ToggleHopper;
 import frc.robot.commands.intake.ToggleIntake;
+import frc.robot.commands.shooter.InterpolateShooter;
 import frc.robot.commands.shooter.SetShooter;
-import frc.robot.commands.shooter.ToggleShooter;
 import frc.robot.commands.wrist.SetWrist;
 import frc.robot.subsystems.Centerer;
 import frc.robot.subsystems.Centerer.CentererState;
@@ -44,14 +44,16 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterSetting;
 import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Wrist.WristState;
+import frc.util.Limelight;
 
 public class RobotContainer {
+	private final Limelight limelight = new Limelight(kLimelightLensHeight, kLimelightMountAngle, kVisionTapeHeight);
 	private final Centerer centerer = new Centerer();
 	private final Drivetrain drivetrain = new Drivetrain();
 	private final Hopper hopper = new Hopper();
 	private final Intake intake = new Intake();
-	private final Shooter shooter = new Shooter();
-	private final Hood hood = new Hood();
+	private final Shooter shooter = new Shooter(limelight);
+	private final Hood hood = new Hood(limelight);
 	private final Wrist wrist = new Wrist();
 	private final Climber climber = new Climber();
 
@@ -79,6 +81,8 @@ public class RobotContainer {
 	});
 
 	private final Trigger hopperEnabled = new Trigger(() -> hopper.getAutoEnabled());
+	private final Trigger hopperFull = new Trigger(() -> hopper.isFull());
+	private final Trigger limelightHasTarget = new Trigger(() -> limelight.hasTarget());
 
 	public RobotContainer() {
 		configureButtonBindings();
@@ -116,15 +120,13 @@ public class RobotContainer {
 						() -> driverController.getRawButton(Button.kLeftBumper.value)));
 
 		intakeButton
+				// Hopefully will make the intake retract when we have two cargo TODO test
+				.and(hopperFull.negate())
 				// While the button is pressed
 				.whileActiveContinuous(
 						new ParallelCommandGroup(
 								// Start the intake
 								new ToggleIntake(intake, IntakeState.INTAKE),
-								// Start the centerers
-								// new ToggleCenterer(centerer, CentererState.CENTER),
-								// Now part of the intakeHopper command
-
 								// Start the hopper
 								new SelectCommand(
 										() -> hopper.getAutoEnabled()
@@ -152,31 +154,21 @@ public class RobotContainer {
 				// When the button is released put the wrist in
 				.whenInactive(new SetWrist(wrist, WristState.IN))
 				// When automatic sorting is disabled set the hopper to unload cargo as well
-				.and(hopperEnabled.negate()).whileActiveOnce(new ParallelCommandGroup(
-						new ToggleHopper(hopper, HopperSetting.OUTTAKETOP),
-						new ToggleShooter(shooter, ShooterSetting.REVERSE)));
+				.and(hopperEnabled.negate())
+				.whileActiveContinuous(new SetShooter(shooter, ShooterSetting.REVERSE.RPM))
+				.whileActiveOnce(new ToggleHopper(hopper, HopperSetting.OUTTAKETOP))
+				.whenInactive(new SetShooter(shooter, 0));
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
-				.and(flywheelAtSpeed)
+				//.and(flywheelAtSpeed)
 				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
 
 		new JoystickButton(operatorController, Button.kLeftBumper.value)
 				.whenPressed(new ToggleAutoHopper(hopper));
 
-		new JoystickButton(operatorController, Button.kY.value)
-				.whenPressed(new SetShooter(shooter, ShooterSetting.LAUNCHPAD))
-				.whenPressed(new SetHood(hood, ShooterSetting.LAUNCHPAD.angle));
-
-		new JoystickButton(operatorController, Button.kB.value)
-				.whenPressed(new SetShooter(shooter, ShooterSetting.TARMAC))
-				.whenPressed(new SetHood(hood, ShooterSetting.TARMAC.angle));
-
-		new JoystickButton(operatorController, Button.kA.value)
-				.whenPressed(new SetShooter(shooter, ShooterSetting.FENDER))
-				.whenPressed(new SetHood(hood, ShooterSetting.FENDER.angle));
-
 		new JoystickButton(operatorController, Button.kX.value)
-				.whenPressed(new SetShooter(shooter, ShooterSetting.IDLE));
+				//.and(limelightHasTarget)
+				.toggleWhenActive(new InterpolateShooter(shooter, hood));
 
 		new JoystickButton(operatorController, Button.kRightBumper.value)
 				.whenPressed(new CalibrateHood(hood));
@@ -199,6 +191,7 @@ public class RobotContainer {
 				.whenInactive(new InstantCommand(() -> Robot.logger.log("Climber down button released")));
 
 		flywheelAtSpeed.whileActiveOnce(new RumbleController(driverController, 0.2));
+		hopperFull.whileActiveOnce(new RumbleController(operatorController, 0.2));
 	}
 
 	public Command getAutoCommand() {

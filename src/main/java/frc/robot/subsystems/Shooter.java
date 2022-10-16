@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.ShooterConstants.kBackShooterID;
 import static frc.robot.Constants.ShooterConstants.kFrontShooterID;
+import static frc.robot.ShooterTable.shooterRPMTable;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -12,11 +13,15 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.util.Limelight;
+import frc.util.LinearInterpolator;
 
 public class Shooter extends SubsystemBase {
 	private final TalonFX leftMotor = new TalonFX(kFrontShooterID);
 	private final TalonFX rightMotor = new TalonFX(kBackShooterID);
 	private final PIDController PID = new PIDController(0.00006, 0, 0);
+	private final LinearInterpolator interpolator = new LinearInterpolator(shooterRPMTable);
+	public final Limelight limelight;
 
 	private ShooterSetting currentSetting = ShooterSetting.IDLE;
 
@@ -37,7 +42,7 @@ public class Shooter extends SubsystemBase {
 		}
 	}
 
-	public Shooter() {
+	public Shooter(Limelight limelight) {
 		leftMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 30);
 		leftMotor.setNeutralMode(NeutralMode.Coast);
 		leftMotor.configOpenloopRamp(1);
@@ -59,11 +64,21 @@ public class Shooter extends SubsystemBase {
 		rightMotor.follow(leftMotor, FollowerType.PercentOutput);
 
 		SmartDashboard.putNumber("Shooter RPM", 0);
+		this.limelight = limelight;
 	}
 
-	@Override
-	public void periodic() {
+	public double getInterpolatedValue() {
+		System.out.println(limelight.getDistance());
+		return interpolator.getInterpolatedValue(limelight.getDistance());
+	}
+
+	public boolean atSetpoint(double range) {
 		double setpoint = currentSetting.RPM;
+		return Math.abs(PID.getVelocityError()) < range && (Math.signum(setpoint) != -1 && Math.signum(setpoint) != 0);
+	}
+
+	public void set(double speed) {
+		double setpoint = speed;
 
 		if (setpoint != 0) {
 			leftMotor.set(ControlMode.Velocity, setpoint / 0.29296875);
@@ -73,14 +88,5 @@ public class Shooter extends SubsystemBase {
 
 		SmartDashboard.putNumber("Actual RPM", leftMotor.getSelectedSensorVelocity() * 0.29296875);
 		SmartDashboard.putNumber("voltage used", leftMotor.getMotorOutputVoltage());
-	}
-
-	public boolean atSetpoint(double range) {
-		double setpoint = currentSetting.RPM;
-		return Math.abs(PID.getVelocityError()) < range && (Math.signum(setpoint) != -1 && Math.signum(setpoint) != 0);
-	}
-
-	public void set(ShooterSetting setting) {
-		currentSetting = setting;
 	}
 }

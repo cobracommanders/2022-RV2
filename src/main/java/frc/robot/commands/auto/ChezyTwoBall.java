@@ -26,7 +26,7 @@ public class ChezyTwoBall extends SequentialCommandGroup {
 						new SequentialCommandGroup(
 								new CalibrateHood(hood),
 								new ResetGyro(drivetrain),
-								new SetShooter(shooter, ShooterSetting.FENDER),
+								new SetShooter(shooter, ShooterSetting.FENDER.RPM),
 								new SetHood(hood, ShooterSetting.FENDER.angle)),
 						// Shoot
 						new SequentialCommandGroup(
@@ -46,6 +46,6 @@ public class ChezyTwoBall extends SequentialCommandGroup {
 								new SetDrivetrain(drivetrain, 0, 0, 0))),
 
 				new SetHopper(hopper, HopperSetting.IDLE),
-				new SetShooter(shooter, ShooterSetting.IDLE));
+				new SetShooter(shooter, ShooterSetting.IDLE.RPM));
 	}
 }

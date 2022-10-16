@@ -36,6 +36,7 @@ public class Robot extends TimedRobot {
 	public void robotPeriodic() {
 		CommandScheduler.getInstance().run();
 
+		/*
 		// When the field is connected
 		if (!postedMatchData && DriverStation.isFMSAttached()) {
 			logger.log(
@@ -84,7 +85,7 @@ public class Robot extends TimedRobot {
 			logger.log("Robot E-Stopped");
 			postedEStop = true;
 		}
-
+		*/
 	}
 
 	@Override

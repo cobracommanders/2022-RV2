@@ -8,12 +8,16 @@ public final class Constants {
 		public static final double kColorSensorLeniency = 200;
 
 		public static final int kUpperSensorDIO = 0;
-		public static final int kLowerSensorDIO = 8;
+		public static final int kLowerSensorDIO = 1;
 	}
 
 	public static final class ShooterConstants {
 		public static final int kFrontShooterID = 23;
 		public static final int kBackShooterID = 22;
+	}
+
+	public static final class HoodConstants {
+		public static final int kHoodLimitDIO = 2;
 	}
 
 	public static final class WristConstants {
@@ -39,6 +43,12 @@ public final class Constants {
 		public static final int kDriverControllerID = 0;
 		public static final int kOperatorControllerID = 1;
 		public static final double kControllerRumbleRange = 1000;
+	}
+
+	public static final class LimelightConstants {
+		public static final double kVisionTapeHeight = 101.625;
+		public static final double kLimelightMountAngle = 30; 
+		public static final double kLimelightLensHeight = 0.247776 + 1.875 + 24; //May be slightly over
 	}
 
 	public static final class DrivetrainConstants {

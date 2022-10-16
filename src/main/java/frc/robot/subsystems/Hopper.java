@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hopper extends SubsystemBase {
@@ -45,20 +46,19 @@ public class Hopper extends SubsystemBase {
 		frontMotor.set(ControlMode.PercentOutput, currentState.frontSpeed);
 		backMotor.set(ControlMode.PercentOutput, currentState.backSpeed);
 
-		/*
-		 * // System.out.println(currentState);
-		 * // System.out.println(queue);
-		 * SmartDashboard.putBoolean("upper sensor", getUpperSensor());
-		 * // SmartDashboard.putBoolean("correct color", getCargoState() ==
-		 * // HopperCargoState.CORRECT);
-		 * SmartDashboard.putString("state", getOperation().toString());
-		 * SmartDashboard.putData(this);
-		 * SmartDashboard.putNumber("red", colorSensor.getRed());
-		 * SmartDashboard.putNumber("blue", colorSensor.getBlue());
-		 * // SmartDashboard.putString("alliance", alliance.toString());
-		 * SmartDashboard.putBoolean("hopper enabled", autoEnabled);
-		 * SmartDashboard.putBoolean("lower sensor", getLowerSensor());
-		 */
+		// System.out.println(currentState);
+		// // System.out.println(queue);
+		// SmartDashboard.putBoolean("upper sensor", getUpperSensor());
+		// // SmartDashboard.putBoolean("correct color", getCargoState() ==
+		// // HopperCargoState.CORRECT);
+		// SmartDashboard.putString("state", getOperation().toString());
+		// SmartDashboard.putData(this);
+		// SmartDashboard.putNumber("red", colorSensor.getRed());
+		// SmartDashboard.putNumber("blue", colorSensor.getBlue());
+		// // SmartDashboard.putString("alliance", alliance.toString());
+		// SmartDashboard.putBoolean("hopper enabled", autoEnabled);
+		// SmartDashboard.putBoolean("lower sensor", getLowerSensor());
+
 	}
 
 	public enum HopperSetting {
@@ -87,7 +87,19 @@ public class Hopper extends SubsystemBase {
 		EMPTY
 	}
 
-	private HopperState getColorSensor() {
+	public HopperState getOperation() {
+		HopperState currentCargo = getColorSensor();
+		// If there is a cargo in the bottom of the hopper and the color sensor hasn't
+		// read it yet, or if there is a cargo in the top of the hopper and a correct
+		// cargo is in the botom of the hopper, return IDLE to stop the hopper
+		if ((getLowerSensor() && currentCargo == HopperState.EMPTY)
+				|| (getUpperSensor() && currentCargo == HopperState.CORRECT))
+			return HopperState.IDLE;
+		// Else, return the value provided by the color sensor
+		return currentCargo;
+	}
+
+	public HopperState getColorSensor() {
 		// If neither color sensor is detecting a value signifigant enough to singal the
 		// presense of a cargo, return EMPTY
 		if (!((colorSensor.getBlue() > kColorSensorLeniency) || (colorSensor.getRed() > kColorSensorLeniency)))
@@ -103,20 +115,12 @@ public class Hopper extends SubsystemBase {
 			return HopperState.INCORRECT;
 	}
 
-	public HopperState getOperation() {
-		// If there is a cargo in the bottom of the hopper and the color sensor hasn't
-		// read it yet, or if there is a cargo in the top of the hopper and a correct
-		// cargo is in the botom of the hopper, return IDLE to stop the hopper
-		if ((getLowerSensor() && getColorSensor() == HopperState.EMPTY)
-				|| (getUpperSensor() && getColorSensor() == HopperState.CORRECT))
-			return HopperState.IDLE;
-		// Else, return the value provided by the color sensor
-		return getColorSensor();
-
-	}
-
 	public void setState(HopperSetting state) {
 		currentState = state;
+	}
+
+	public boolean isFull() {
+		return getOperation() == HopperState.CORRECT && getUpperSensor();
 	}
 
 	public boolean getUpperSensor() {
