@@ -68,18 +68,17 @@ public class Limelight {
 	 * 
 	 * 
 	 */
-	NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
-	NetworkTableEntry tx = limelightTable.getEntry("tx");
-	NetworkTableEntry ty = limelightTable.getEntry("ty");
-	NetworkTableEntry ta = limelightTable.getEntry("ta");
-	NetworkTableEntry tv = limelightTable.getEntry("tv");
-	NetworkTableEntry camMode = limelightTable.getEntry("camMode");
-	NetworkTableEntry ledMode = limelightTable.getEntry("ledMode");
-	NetworkTableEntry pipeline = limelightTable.getEntry("pipeline");
-	final double lensHeight;
-	final double mountAngle;
+	private final NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+	private final NetworkTableEntry tx = limelightTable.getEntry("tx");
+	private final NetworkTableEntry ty = limelightTable.getEntry("ty");
+	private final NetworkTableEntry ta = limelightTable.getEntry("ta");
+	private final NetworkTableEntry tv = limelightTable.getEntry("tv");
+	private final NetworkTableEntry camMode = limelightTable.getEntry("camMode");
+	private final NetworkTableEntry ledMode = limelightTable.getEntry("ledMode");
+	private final NetworkTableEntry pipeline = limelightTable.getEntry("pipeline");
+	private final double lensHeight;
+	private final double mountAngle;
 	final double visionTapeHeight;
-	double distanceToGoal;
 
 	/**
 	 * Constructs Limelight
@@ -104,18 +103,30 @@ public class Limelight {
 		kOn, kOff, kBlink, kDefault;
 	}
 
+	/**
+	 * @return Horizontal Offset From Crosshair To Target (-29.8 to 29.8 degrees)
+	 */
 	public double getTx() {
 		return tx.getDouble(0);
 	}
 
+	/**
+	 * @return Vertical Offset From Crosshair To Target (-24.85 to 24.85 degrees)
+	 */
 	public double getTy() {
 		return ty.getDouble(0);
 	}
 
+	/**
+	 * @return Target Area (0% of image to 100% of image)
+	 */
 	public double getTa() {
 		return ta.getDouble(0);
 	}
 
+	/**
+	 * @return Whether the limelight has any valid targets (0 or 1)
+	 */
 	public double getTv() {
 		return tv.getDouble(0);
 	}
@@ -126,7 +137,9 @@ public class Limelight {
 		return (visionTapeHeight - lensHeight) / Math.tan(angleToGoalRadians);
 	}
 
-	// Return true if the limelight has a vision target
+	/**
+	 * @return Whether the limelight has any valid targets (true or false)
+	 */
 	public boolean hasTarget() {
 		if (tv.getDouble(0) == 1)
 			return true;

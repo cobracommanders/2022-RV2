@@ -2,10 +2,10 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,25 +28,18 @@ public class Hood extends SubsystemBase {
 	public Hood(Limelight limelight) {
 		motor = new CANSparkMax(36, MotorType.kBrushless);
 		motor.restoreFactoryDefaults();
+		motor.setInverted(true);
 		encoder = motor.getEncoder();
 		motor.setSmartCurrentLimit(20);
 		encoder.setPosition(0);
-		PID = new PIDController(0.0075, 0, 0.0000005);
-		// PID.setTolerance(1);
+		PID = new PIDController(0.1, 0, 0.0035); // P = 0.1 I = 0.0 D = 0.004
 		limit = new DigitalInput(kHoodLimitDIO);
 		motor.setIdleMode(IdleMode.kBrake);
 		this.limelight = limelight;
-		// PID1 = motor.getPIDController();
-		// PID1.setP(0.0075);
-		// PID1.setI(0);
-		// PID1.setD(0.0000005);
-		// PID1.setOutputRange(-1, 1);
 
-		// motor.setSoftLimit(SoftLimitDirection.kReverse, 1.4F);
-		// motor.enableSoftLimit(SoftLimitDirection.kForward, true);
+		motor.setSoftLimit(SoftLimitDirection.kForward, 26F);
 
-		// motor.setSoftLimit(SoftLimitDirection.kForward, 0F);
-		// motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+		motor.enableSoftLimit(SoftLimitDirection.kForward, true);
 
 		// SmartDashboard.putNumber("Hood Angle", 0);
 	}
@@ -61,7 +54,8 @@ public class Hood extends SubsystemBase {
 	}
 
 	public void setAngle(double angle) {
-		PID.setSetpoint(angle * -20);
+		// Makes it so that the given angle is a number from 0 (low) to 1 (high)
+		PID.setSetpoint(angle * 26);
 		// PID1.setReference(angle, ControlType.kPosition);
 	}
 
@@ -70,7 +64,7 @@ public class Hood extends SubsystemBase {
 	}
 
 	public void setMotor(double speed) {
-		motor.set(-speed);
+		motor.set(speed);
 	}
 
 	public void resetEncoder() {
@@ -87,15 +81,21 @@ public class Hood extends SubsystemBase {
 
 	@Override
 	public void periodic() {
+		// POSITIVE VALUES LOWER THE HOOD
+		double power = PID.calculate(encoder.getPosition());
+		SmartDashboard.putNumber("PID Reading", power);
+		if (currentControlMode == ControlMode.PID) {
+			if (!(Math.signum(power) == -1 && getLimit())) {
+				motor.set(power);
+			} else {
+				motor.set(0);
+			}
+		}
+		SmartDashboard.putBoolean("Hood powered", !(Math.signum(power) == -1 && getLimit()));
 		SmartDashboard.putBoolean("hood limit", getLimit());
 		SmartDashboard.putData(this);
 		SmartDashboard.putNumber("hood encoder", encoder.getPosition());
 		SmartDashboard.putNumber("hood error", PID.getPositionError());
-		if (currentControlMode == ControlMode.PID)
-			// if (PID.getPositionError() > 0.5)
-				motor.set(MathUtil.clamp(PID.calculate(encoder.getPosition()), -0.5, 0.5));
-			// else {
-			// 	motor.set(0);
-			// }
+		SmartDashboard.putString("Control mode", currentControlMode.toString());
 	}
 }

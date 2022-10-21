@@ -1,7 +1,6 @@
 package frc.robot.commands.centerer;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
 import frc.robot.subsystems.Centerer;
 import frc.robot.subsystems.Centerer.CentererState;
 
@@ -19,8 +18,6 @@ public class ToggleCenterer extends CommandBase {
 	@Override
 	public void initialize() {
 		centerer.setState(state);
-		centerer.getCounter().add();
-		Robot.logger.log("Set centerer");
 	}
 
 	@Override

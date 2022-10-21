@@ -5,7 +5,7 @@ public final class Constants {
 		public static final int kFrontHopperID = 20;
 		public static final int kBackHopperID = 21;
 
-		public static final double kColorSensorLeniency = 200;
+		public static final double kColorSensorLeniency = 400; //Used to be 200
 
 		public static final int kUpperSensorDIO = 0;
 		public static final int kLowerSensorDIO = 1;

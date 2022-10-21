@@ -47,17 +47,17 @@ public class Hopper extends SubsystemBase {
 		backMotor.set(ControlMode.PercentOutput, currentState.backSpeed);
 
 		// System.out.println(currentState);
-		// // System.out.println(queue);
-		// SmartDashboard.putBoolean("upper sensor", getUpperSensor());
-		// // SmartDashboard.putBoolean("correct color", getCargoState() ==
-		// // HopperCargoState.CORRECT);
-		// SmartDashboard.putString("state", getOperation().toString());
-		// SmartDashboard.putData(this);
-		// SmartDashboard.putNumber("red", colorSensor.getRed());
-		// SmartDashboard.putNumber("blue", colorSensor.getBlue());
-		// // SmartDashboard.putString("alliance", alliance.toString());
-		// SmartDashboard.putBoolean("hopper enabled", autoEnabled);
-		// SmartDashboard.putBoolean("lower sensor", getLowerSensor());
+		// System.out.println(queue);
+		SmartDashboard.putBoolean("upper sensor", getUpperSensor());
+		// SmartDashboard.putBoolean("correct color", getCargoState() ==
+		// HopperCargoState.CORRECT);
+		SmartDashboard.putString("state", getOperation().toString());
+		SmartDashboard.putData(this);
+		SmartDashboard.putNumber("red", colorSensor.getRed());
+		SmartDashboard.putNumber("blue", colorSensor.getBlue());
+		// SmartDashboard.putString("alliance", alliance.toString());
+		SmartDashboard.putBoolean("hopper enabled", autoEnabled);
+		SmartDashboard.putBoolean("lower sensor", getLowerSensor());
 
 	}
 
@@ -102,7 +102,8 @@ public class Hopper extends SubsystemBase {
 	public HopperState getColorSensor() {
 		// If neither color sensor is detecting a value signifigant enough to singal the
 		// presense of a cargo, return EMPTY
-		if (!((colorSensor.getBlue() > kColorSensorLeniency) || (colorSensor.getRed() > kColorSensorLeniency)))
+		if (!((colorSensor.getBlue() > kColorSensorLeniency)
+				|| (colorSensor.getRed() > kColorSensorLeniency)))
 			return HopperState.EMPTY;
 
 		// If the alliance is blue and the reading from blue is stronger than red, or if
@@ -120,7 +121,7 @@ public class Hopper extends SubsystemBase {
 	}
 
 	public boolean isFull() {
-		return getOperation() == HopperState.CORRECT && getUpperSensor();
+		return getColorSensor() == HopperState.CORRECT && getUpperSensor();
 	}
 
 	public boolean getUpperSensor() {

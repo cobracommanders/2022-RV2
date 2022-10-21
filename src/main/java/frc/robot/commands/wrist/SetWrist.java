@@ -19,4 +19,9 @@ public class SetWrist extends CommandBase {
 	public void initialize() {
 		wrist.setState(state);
 	}
+
+	@Override
+	public boolean isFinished() {
+		return true;
+	}
 }

@@ -19,11 +19,26 @@ import static frc.robot.Constants.DrivetrainConstants.kFrontRightModuleEncoderID
 import static frc.robot.Constants.DrivetrainConstants.kFrontRightModuleOffset;
 import static frc.robot.Constants.DrivetrainConstants.kFrontRightModuleSteerID;
 
+import java.util.Optional;
+
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4ModuleConfiguration;
 import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
+
+import org.team498.common.control.CentripetalAccelerationConstraint;
+import org.team498.common.control.FeedforwardConstraint;
+import org.team498.common.control.HolonomicMotionProfiledTrajectoryFollower;
+import org.team498.common.control.MaxAccelerationConstraint;
+import org.team498.common.control.PIDConstants;
+import org.team498.common.control.TrajectoryConstraint;
+import org.team498.common.math.RigidTransform2;
+import org.team498.common.math.Rotation2;
+import org.team498.common.math.Vector2;
+import org.team498.common.util.DrivetrainFeedforwardConstants;
+import org.team498.common.util.HolonomicDriveSignal;
+import org.team498.common.util.HolonomicFeedforward;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,10 +47,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.util.Limelight;
 
 public class Drivetrain extends SubsystemBase {
 	/**
@@ -101,8 +118,8 @@ public class Drivetrain extends SubsystemBase {
 	private final Mk4ModuleConfiguration configuration = new Mk4ModuleConfiguration();
 
 	public Drivetrain() {
-		//configuration.setDriveCurrentLimit(35);
-		//configuration.setSteerCurrentLimit(20);
+		// configuration.setDriveCurrentLimit(35);
+		// configuration.setSteerCurrentLimit(20);
 
 		frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
 				configuration,
@@ -149,8 +166,15 @@ public class Drivetrain extends SubsystemBase {
 		IMU.calibrate();
 	}
 
+	/**
+	 * Returns the reading of the gyro sensor from 180 to -180
+	 */
 	public Rotation2d getGyroAngle() {
 		return Rotation2d.fromDegrees(-IMU.getYaw());
+	}
+
+	public double IMUAngle() {
+		return IMU.getAngle();
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
@@ -159,8 +183,31 @@ public class Drivetrain extends SubsystemBase {
 
 	private Field2d field = new Field2d();
 
+	private Rotation2 getAngularVelocity() {
+		return Rotation2.fromDegrees(IMU.getRate());
+	}
+
+	HolonomicDriveSignal driveSignal = new HolonomicDriveSignal(Vector2.ZERO, Rotation2.ZERO, false);
+	Vector2 velocity = Vector2.ZERO;
+
 	@Override
 	public void periodic() {
+		Optional<HolonomicDriveSignal> trajectorySignal = follower.update(
+				RigidTransform2.fromPose2d(odometry.getPoseMeters()),
+				velocity,
+				getAngularVelocity().toRadians(),
+				.3,
+				.1);
+		if (trajectorySignal.isPresent()) {
+			driveSignal = trajectorySignal.get();
+			driveSignal = new HolonomicDriveSignal(
+					driveSignal.getTranslation().scale(1.0 / RobotController.getBatteryVoltage()),
+					driveSignal.getRotation().toRadians() / RobotController.getBatteryVoltage(),
+					driveSignal.isFieldOriented());
+			chassisSpeeds = new ChassisSpeeds(driveSignal.getTranslation().x, driveSignal.getTranslation().y,
+					driveSignal.getRotation().toRadians());
+		}
+
 		SmartDashboard.putNumber("Gyro", IMU.getAngle());
 		SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
 		SwerveDriveKinematics.desaturateWheelSpeeds(states, kMaxVelocityMetersPerSecond);
@@ -176,6 +223,32 @@ public class Drivetrain extends SubsystemBase {
 
 		odometry.update(getGyroAngle(), states);
 		field.setRobotPose(odometry.getPoseMeters());
+		velocity = new Vector2(kinematics.toChassisSpeeds(states).vxMetersPerSecond,
+				kinematics.toChassisSpeeds(states).vyMetersPerSecond);
 		// SmartDashboard.putData(field);
+		SmartDashboard.putBoolean("Trajectory Active", trajectorySignal.isPresent());
+		SmartDashboard.putNumber("trajectory Distance", driveSignal.getTranslation().length);
+		SmartDashboard.putNumber("Chassis speeds",
+				Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond));
+	}
+
+	public static final DrivetrainFeedforwardConstants FEEDFORWARD_CONSTANTS = new DrivetrainFeedforwardConstants(
+			0.042746,
+			0.0032181,
+			0.30764);
+
+	public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
+			new FeedforwardConstraint(11.0, FEEDFORWARD_CONSTANTS.getVelocityConstant(),
+					FEEDFORWARD_CONSTANTS.getAccelerationConstant(), false),
+			new MaxAccelerationConstraint(12.5 * 12.0),
+			new CentripetalAccelerationConstraint(15 * 12.0)
+	};
+	private final HolonomicMotionProfiledTrajectoryFollower follower = new HolonomicMotionProfiledTrajectoryFollower(
+			new PIDConstants(0.4, 0.0, 0.025),
+			new PIDConstants(5.0, 0.0, 0.0),
+			new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
+
+	public HolonomicMotionProfiledTrajectoryFollower getFollower() {
+		return follower;
 	}
 }

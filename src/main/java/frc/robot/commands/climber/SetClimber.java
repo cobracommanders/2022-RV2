@@ -3,7 +3,6 @@ package frc.robot.commands.climber;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
 import frc.robot.subsystems.Climber;
 
 // Sets the climber to a given speed
@@ -19,11 +18,6 @@ public class SetClimber extends CommandBase {
 	}
 
 	@Override
-	public void initialize() {
-		Robot.logger.log("Starting climbers");
-	}
-
-	@Override
 	public void execute() {
 		double left = deadzone(this.left.getAsDouble(), 0.3);
 
@@ -35,7 +29,6 @@ public class SetClimber extends CommandBase {
 	public void end(boolean interrupted) {
 		climber.setSpeedLeft(0);
 		climber.setSpeedRight(0);
-		Robot.logger.log("Stopping climbers");
 	}
 
 	private double deadzone(double input, double deadzone) {

@@ -1,30 +1,39 @@
 package frc.robot;
 
+import static frc.robot.Constants.LimelightConstants.kLimelightLensHeight;
+import static frc.robot.Constants.LimelightConstants.kLimelightMountAngle;
+import static frc.robot.Constants.LimelightConstants.kVisionTapeHeight;
 import static frc.robot.Constants.OIConstants.kControllerRumbleRange;
 import static frc.robot.Constants.OIConstants.kDriverControllerID;
 import static frc.robot.Constants.OIConstants.kOperatorControllerID;
-import static frc.robot.Constants.LimelightConstants.*;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CalibrateGyro;
+import frc.robot.commands.LimelightTestingSetup;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.RumbleController;
 import frc.robot.commands.auto.ChezyTwoBall;
 import frc.robot.commands.centerer.ToggleCenterer;
 import frc.robot.commands.climber.SetClimber;
 import frc.robot.commands.climber.TuneClimber;
+import frc.robot.commands.drivetrain.RotatingLinearTrajectory;
 import frc.robot.commands.drivetrain.FieldOrientedDrive;
+import frc.robot.commands.drivetrain.LimelightAlign;
+import frc.robot.commands.drivetrain.LinearTrajectory;
+import frc.robot.commands.drivetrain.ParabolicTrajectory;
 import frc.robot.commands.drivetrain.RobotOrientedDrive;
+import frc.robot.commands.drivetrain.SplineTrajectory;
 import frc.robot.commands.hood.CalibrateHood;
 import frc.robot.commands.hopper.IntakeHopper;
+import frc.robot.commands.hopper.ShootCargo;
 import frc.robot.commands.hopper.ToggleAutoHopper;
 import frc.robot.commands.hopper.ToggleHopper;
 import frc.robot.commands.intake.ToggleIntake;
@@ -105,6 +114,33 @@ public class RobotContainer {
 	private void configureButtonBindings() {
 		new JoystickButton(driverController, Button.kA.value).whenPressed(new ResetGyro(drivetrain));
 
+		new JoystickButton(operatorController, Button.kA.value).whileHeld(new LimelightAlign(drivetrain, limelight));
+
+		new JoystickButton(driverController, Button.kBack.value).whenPressed(new SequentialCommandGroup(
+			//	new ParabolicTrajectory(drivetrain, 1, 1, 0, 0, 1);
+			// new LinearTrajectory(drivetrain, 2, 2, 0, 1),
+			// new LinearTrajectory(drivetrain, 2, -2, 0, 2),
+			// new LinearTrajectory(drivetrain, 0, 2, 0, 2)
+
+			//new RotatingLinearTrajectory(drivetrain, 0, 0, 90, 10)
+		));
+
+		new JoystickButton(driverController, Button.kStart.value).toggleWhenActive(new SequentialCommandGroup(
+			//	new ParabolicTrajectory(drivetrain, 1, 1, 0, 0, 1);
+			// new LinearTrajectory(drivetrain, 2, 2, 0, 1),
+			// new LinearTrajectory(drivetrain, 2, -2, 0, 2),
+			// new LinearTrajectory(drivetrain, 0, 2, 0, 2)
+
+			new LimelightTestingSetup(shooter, hood, limelight)
+		));
+
+
+		// new JoystickButton(driverController, Button.kBack.value).whenPressed(
+		// new SplineTrajectory(drivetrain, new double[] { 0, 0, 0 }, new double[] { 0,
+		// 0, 0 },
+		// new double[] { 1, 0, 0 }, new double[] { 0, 0, 0 }, 1));
+
+
 		new JoystickButton(driverController, Button.kB.value).toggleWhenPressed(
 				new RobotOrientedDrive(
 						drivetrain,
@@ -160,14 +196,15 @@ public class RobotContainer {
 				.whenInactive(new SetShooter(shooter, 0));
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
-				//.and(flywheelAtSpeed)
+				// .and(flywheelAtSpeed)
 				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
+				// .whenActive(new ShootCargo(hopper));
 
 		new JoystickButton(operatorController, Button.kLeftBumper.value)
 				.whenPressed(new ToggleAutoHopper(hopper));
 
 		new JoystickButton(operatorController, Button.kX.value)
-				//.and(limelightHasTarget)
+				// .and(limelightHasTarget)
 				.toggleWhenActive(new InterpolateShooter(shooter, hood));
 
 		new JoystickButton(operatorController, Button.kRightBumper.value)
@@ -181,14 +218,10 @@ public class RobotContainer {
 				false);
 
 		climberUp.whileActiveOnce(
-				new SetClimber(climber, () -> operatorController.getRawAxis(Axis.kRightTrigger.value)))
-				.whenActive(new InstantCommand(() -> Robot.logger.log("Climber up button pressed")))
-				.whenInactive(new InstantCommand(() -> Robot.logger.log("Climber up button released")));
+				new SetClimber(climber, () -> operatorController.getRawAxis(Axis.kRightTrigger.value)));
 
 		climberDown.whileActiveOnce(
-				new SetClimber(climber, () -> -operatorController.getRawAxis(Axis.kLeftTrigger.value)))
-				.whenActive(new InstantCommand(() -> Robot.logger.log("Climber down button pressed")))
-				.whenInactive(new InstantCommand(() -> Robot.logger.log("Climber down button released")));
+				new SetClimber(climber, () -> -operatorController.getRawAxis(Axis.kLeftTrigger.value)));
 
 		flywheelAtSpeed.whileActiveOnce(new RumbleController(driverController, 0.2));
 		hopperFull.whileActiveOnce(new RumbleController(operatorController, 0.2));
