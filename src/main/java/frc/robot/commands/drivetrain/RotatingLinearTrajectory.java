@@ -56,7 +56,7 @@ public class RotatingLinearTrajectory extends CommandBase {
 		drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
 				time < Math.abs(xScalar) * kSlowDownPrecentage ? xScalar * time : xScalar,
 				time < Math.abs(yScalar) * kSlowDownPrecentage ? yScalar * time : yScalar,
-				clampBelow(rotationSpeed, kMaxSpeed),
+				clampBelow(rotationSpeed + Math.copySign(0.5, rotationSpeed), kMaxSpeed),
 				drivetrain.getGyroAngle()));
 	}
 

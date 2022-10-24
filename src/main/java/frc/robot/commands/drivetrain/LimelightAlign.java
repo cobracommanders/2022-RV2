@@ -13,7 +13,7 @@ public class LimelightAlign extends CommandBase {
 	 * Maximum speed of the robot while aligning in meters per second
 	 */
 	private final double kMaxSpeed = 3;
-	private final double kAcceptedRange = 0.25;
+	private final double kAcceptedRange = 0.35;
 	private final double kP;
 
 	public LimelightAlign(Drivetrain drivetrain, Limelight limelight) {
@@ -29,7 +29,7 @@ public class LimelightAlign extends CommandBase {
 	@Override
 	public void execute() {
 		double rotationalSpeed = clampBelow(limelight.getTx() * kP, kMaxSpeed);
-		drivetrain.drive(new ChassisSpeeds(0, 0, -rotationalSpeed + Math.copySign(0.2, -rotationalSpeed)));
+		drivetrain.drive(new ChassisSpeeds(0, 0, -rotationalSpeed + Math.copySign(0.3, -rotationalSpeed)));
 	}
 
 	@Override

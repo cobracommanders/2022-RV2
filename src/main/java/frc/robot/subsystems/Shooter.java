@@ -72,14 +72,15 @@ public class Shooter extends SubsystemBase {
 		return interpolator.getInterpolatedValue(limelight.getDistance());
 	}
 
+	private double currentSetpoint;
+
 	public boolean atSetpoint(double range) {
-		double setpoint = currentSetting.RPM;
-		return Math.abs(PID.getVelocityError()) < range && (Math.signum(setpoint) != -1 && Math.signum(setpoint) != 0);
+		return Math.abs(currentSetpoint - (leftMotor.getSelectedSensorVelocity() / 2048)) < range
+				&& (Math.signum(currentSetpoint) != -1 && Math.signum(currentSetpoint) != 0);
 	}
 
-	public void set(double speed) {
-		double setpoint = speed;
-
+	public void set(double setpoint) {
+		this.currentSetpoint = setpoint;
 		if (setpoint != 0) {
 			leftMotor.set(ControlMode.Velocity, setpoint / 0.29296875);
 		} else {

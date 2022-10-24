@@ -118,8 +118,8 @@ public class Drivetrain extends SubsystemBase {
 	private final Mk4ModuleConfiguration configuration = new Mk4ModuleConfiguration();
 
 	public Drivetrain() {
-		// configuration.setDriveCurrentLimit(35);
-		// configuration.setSteerCurrentLimit(20);
+		configuration.setDriveCurrentLimit(35);
+		configuration.setSteerCurrentLimit(20);
 
 		frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
 				configuration,

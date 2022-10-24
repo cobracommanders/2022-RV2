@@ -19,8 +19,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.CalibrateGyro;
 import frc.robot.commands.LimelightTestingSetup;
 import frc.robot.commands.ResetGyro;
-import frc.robot.commands.RumbleController;
+import frc.robot.commands.RumbleControllerLeft;
+import frc.robot.commands.RumbleControllerRight;
 import frc.robot.commands.auto.ChezyTwoBall;
+import frc.robot.commands.auto.StateChampsTwoBall;
 import frc.robot.commands.centerer.ToggleCenterer;
 import frc.robot.commands.climber.SetClimber;
 import frc.robot.commands.climber.TuneClimber;
@@ -32,6 +34,7 @@ import frc.robot.commands.drivetrain.ParabolicTrajectory;
 import frc.robot.commands.drivetrain.RobotOrientedDrive;
 import frc.robot.commands.drivetrain.SplineTrajectory;
 import frc.robot.commands.hood.CalibrateHood;
+import frc.robot.commands.hood.SetHood;
 import frc.robot.commands.hopper.IntakeHopper;
 import frc.robot.commands.hopper.ShootCargo;
 import frc.robot.commands.hopper.ToggleAutoHopper;
@@ -114,32 +117,29 @@ public class RobotContainer {
 	private void configureButtonBindings() {
 		new JoystickButton(driverController, Button.kA.value).whenPressed(new ResetGyro(drivetrain));
 
-		new JoystickButton(operatorController, Button.kA.value).whileHeld(new LimelightAlign(drivetrain, limelight));
+		new JoystickButton(operatorController, Button.kY.value).whileHeld(new LimelightAlign(drivetrain, limelight));
 
 		new JoystickButton(driverController, Button.kBack.value).whenPressed(new SequentialCommandGroup(
-			//	new ParabolicTrajectory(drivetrain, 1, 1, 0, 0, 1);
-			// new LinearTrajectory(drivetrain, 2, 2, 0, 1),
-			// new LinearTrajectory(drivetrain, 2, -2, 0, 2),
-			// new LinearTrajectory(drivetrain, 0, 2, 0, 2)
+				// new ParabolicTrajectory(drivetrain, 1, 1, 0, 0, 1);
+				// new LinearTrajectory(drivetrain, 2, 2, 0, 1),
+				// new LinearTrajectory(drivetrain, 2, -2, 0, 2),
+				// new LinearTrajectory(drivetrain, 0, 2, 0, 2)
 
-			//new RotatingLinearTrajectory(drivetrain, 0, 0, 90, 10)
-		));
+				new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight)));
+		// new RotatingLinearTrajectory(drivetrain, 0, 0, 90, 10)));
 
 		new JoystickButton(driverController, Button.kStart.value).toggleWhenActive(new SequentialCommandGroup(
-			//	new ParabolicTrajectory(drivetrain, 1, 1, 0, 0, 1);
-			// new LinearTrajectory(drivetrain, 2, 2, 0, 1),
-			// new LinearTrajectory(drivetrain, 2, -2, 0, 2),
-			// new LinearTrajectory(drivetrain, 0, 2, 0, 2)
+				// new ParabolicTrajectory(drivetrain, 1, 1, 0, 0, 1);
+				// new LinearTrajectory(drivetrain, 2, 2, 0, 1),
+				// new LinearTrajectory(drivetrain, 2, -2, 0, 2),
+				// new LinearTrajectory(drivetrain, 0, 2, 0, 2)
 
-			new LimelightTestingSetup(shooter, hood, limelight)
-		));
-
+				new LimelightTestingSetup(shooter, hood, limelight)));
 
 		// new JoystickButton(driverController, Button.kBack.value).whenPressed(
 		// new SplineTrajectory(drivetrain, new double[] { 0, 0, 0 }, new double[] { 0,
 		// 0, 0 },
 		// new double[] { 1, 0, 0 }, new double[] { 0, 0, 0 }, 1));
-
 
 		new JoystickButton(driverController, Button.kB.value).toggleWhenPressed(
 				new RobotOrientedDrive(
@@ -156,7 +156,7 @@ public class RobotContainer {
 						() -> driverController.getRawButton(Button.kLeftBumper.value)));
 
 		intakeButton
-				// Hopefully will make the intake retract when we have two cargo TODO test
+				// Makes the intake retract when we have two cargo
 				.and(hopperFull.negate())
 				// While the button is pressed
 				.whileActiveContinuous(
@@ -198,14 +198,28 @@ public class RobotContainer {
 		new JoystickButton(driverController, Button.kRightBumper.value)
 				// .and(flywheelAtSpeed)
 				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
-				// .whenActive(new ShootCargo(hopper));
+		// .whenActive(new ShootCargo(hopper));
 
 		new JoystickButton(operatorController, Button.kLeftBumper.value)
 				.whenPressed(new ToggleAutoHopper(hopper));
 
 		new JoystickButton(operatorController, Button.kX.value)
 				// .and(limelightHasTarget)
-				.toggleWhenActive(new InterpolateShooter(shooter, hood));
+				.toggleWhenActive(new ParallelCommandGroup(
+						new InterpolateShooter(shooter, hood),
+						new RumbleControllerLeft(operatorController, 1)));
+
+		new JoystickButton(operatorController, Button.kA.value)
+				.toggleWhenActive(new ParallelCommandGroup(
+						new SetShooter(shooter, 2000),
+						new SetHood(hood, 0),
+						new RumbleControllerLeft(operatorController, 1)));
+
+		new JoystickButton(operatorController, Button.kB.value)
+				.toggleWhenActive(new ParallelCommandGroup(
+						new SetShooter(shooter, 1000),
+						new SetHood(hood, 1),
+						new RumbleControllerLeft(operatorController, 1)));
 
 		new JoystickButton(operatorController, Button.kRightBumper.value)
 				.whenPressed(new CalibrateHood(hood));
@@ -223,12 +237,14 @@ public class RobotContainer {
 		climberDown.whileActiveOnce(
 				new SetClimber(climber, () -> -operatorController.getRawAxis(Axis.kLeftTrigger.value)));
 
-		flywheelAtSpeed.whileActiveOnce(new RumbleController(driverController, 0.2));
-		hopperFull.whileActiveOnce(new RumbleController(operatorController, 0.2));
+		// flywheelAtSpeed.whileActiveOnce(new RumbleControllerRight(driverController,
+		// 0.2));
+
+		hopperFull.whileActiveContinuous(new RumbleControllerRight(driverController, 0.2));
 	}
 
 	public Command getAutoCommand() {
-		return new ChezyTwoBall(drivetrain, hood, shooter, hopper);
+		return new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
 	}
 
 	public Command getRobotInitCommand() {
