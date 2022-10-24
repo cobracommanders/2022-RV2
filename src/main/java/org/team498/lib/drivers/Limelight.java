@@ -1,4 +1,4 @@
-package org.team498.C2022.util;
+package org.team498.lib.drivers;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;

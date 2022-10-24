@@ -8,8 +8,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import org.team498.C2022.util.Limelight;
-import org.team498.C2022.util.LinearInterpolator;
+import org.team498.lib.drivers.Limelight;
+import org.team498.lib.util.LinearInterpolator;
 
 import com.revrobotics.RelativeEncoder;
 

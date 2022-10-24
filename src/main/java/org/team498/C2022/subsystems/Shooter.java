@@ -10,8 +10,8 @@ import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
-import org.team498.C2022.util.Limelight;
-import org.team498.C2022.util.LinearInterpolator;
+import org.team498.lib.drivers.Limelight;
+import org.team498.lib.util.LinearInterpolator;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
