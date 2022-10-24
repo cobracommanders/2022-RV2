@@ -14,17 +14,12 @@ public class LinearTrajectory extends CommandBase {
 	// private double y;
 	// private double r;
 	// private double t2;
-	private double dx;
-	private double dy;
-	private double dr;
 	// private double dt;
 	private double xScalar;
 	private double yScalar;
 	private double rps;
 	private Timer timer = new Timer();
 	private double seconds;
-	private double distance;
-	private double totalDistance;
 
 	/**
 	 * @apiNote all units in meters

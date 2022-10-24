@@ -3,7 +3,6 @@ package org.team498.C2022;
 import static org.team498.C2022.Constants.LimelightConstants.kLimelightLensHeight;
 import static org.team498.C2022.Constants.LimelightConstants.kLimelightMountAngle;
 import static org.team498.C2022.Constants.LimelightConstants.kVisionTapeHeight;
-import static org.team498.C2022.Constants.OIConstants.kControllerRumbleRange;
 import static org.team498.C2022.Constants.OIConstants.kDriverControllerID;
 import static org.team498.C2022.Constants.OIConstants.kOperatorControllerID;
 
@@ -12,22 +11,16 @@ import org.team498.C2022.commands.LimelightTestingSetup;
 import org.team498.C2022.commands.ResetGyro;
 import org.team498.C2022.commands.RumbleControllerLeft;
 import org.team498.C2022.commands.RumbleControllerRight;
-import org.team498.C2022.commands.auto.ChezyTwoBall;
 import org.team498.C2022.commands.auto.StateChampsTwoBall;
 import org.team498.C2022.commands.centerer.ToggleCenterer;
 import org.team498.C2022.commands.climber.SetClimber;
 import org.team498.C2022.commands.climber.TuneClimber;
 import org.team498.C2022.commands.drivetrain.FieldOrientedDrive;
 import org.team498.C2022.commands.drivetrain.LimelightAlign;
-import org.team498.C2022.commands.drivetrain.LinearTrajectory;
-import org.team498.C2022.commands.drivetrain.ParabolicTrajectory;
 import org.team498.C2022.commands.drivetrain.RobotOrientedDrive;
-import org.team498.C2022.commands.drivetrain.RotatingLinearTrajectory;
-import org.team498.C2022.commands.drivetrain.SplineTrajectory;
 import org.team498.C2022.commands.hood.CalibrateHood;
 import org.team498.C2022.commands.hood.SetHood;
 import org.team498.C2022.commands.hopper.IntakeHopper;
-import org.team498.C2022.commands.hopper.ShootCargo;
 import org.team498.C2022.commands.hopper.ToggleAutoHopper;
 import org.team498.C2022.commands.hopper.ToggleHopper;
 import org.team498.C2022.commands.intake.ToggleIntake;
@@ -35,17 +28,17 @@ import org.team498.C2022.commands.shooter.InterpolateShooter;
 import org.team498.C2022.commands.shooter.SetShooter;
 import org.team498.C2022.commands.wrist.SetWrist;
 import org.team498.C2022.subsystems.Centerer;
+import org.team498.C2022.subsystems.Centerer.CentererState;
 import org.team498.C2022.subsystems.Climber;
 import org.team498.C2022.subsystems.Drivetrain;
 import org.team498.C2022.subsystems.Hood;
 import org.team498.C2022.subsystems.Hopper;
-import org.team498.C2022.subsystems.Intake;
-import org.team498.C2022.subsystems.Shooter;
-import org.team498.C2022.subsystems.Wrist;
-import org.team498.C2022.subsystems.Centerer.CentererState;
 import org.team498.C2022.subsystems.Hopper.HopperSetting;
+import org.team498.C2022.subsystems.Intake;
 import org.team498.C2022.subsystems.Intake.IntakeState;
+import org.team498.C2022.subsystems.Shooter;
 import org.team498.C2022.subsystems.Shooter.ShooterSetting;
+import org.team498.C2022.subsystems.Wrist;
 import org.team498.C2022.subsystems.Wrist.WristState;
 import org.team498.lib.drivers.Limelight;
 
@@ -89,13 +82,9 @@ public class RobotContainer {
 		return operatorController.getRawAxis(Axis.kLeftTrigger.value) > 0.3;
 	});
 
-	private final Trigger flywheelAtSpeed = new Trigger(() -> {
-		return shooter.atSetpoint(kControllerRumbleRange);
-	});
 
 	private final Trigger hopperEnabled = new Trigger(() -> hopper.getAutoEnabled());
 	private final Trigger hopperFull = new Trigger(() -> hopper.isFull());
-	private final Trigger limelightHasTarget = new Trigger(() -> limelight.hasTarget());
 
 	public RobotContainer() {
 		configureButtonBindings();

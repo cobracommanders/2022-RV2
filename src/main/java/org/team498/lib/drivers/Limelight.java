@@ -75,7 +75,7 @@ public class Limelight {
 	private final NetworkTableEntry tv = limelightTable.getEntry("tv");
 	private final NetworkTableEntry camMode = limelightTable.getEntry("camMode");
 	private final NetworkTableEntry ledMode = limelightTable.getEntry("ledMode");
-	private final NetworkTableEntry pipeline = limelightTable.getEntry("pipeline");
+	// private final NetworkTableEntry pipeline = limelightTable.getEntry("pipeline");
 	private final double lensHeight;
 	private final double mountAngle;
 	final double visionTapeHeight;

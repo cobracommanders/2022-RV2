@@ -25,7 +25,7 @@ public class SplineTrajectory extends CommandBase {
     private double x5;
     private double dx;
     private double dy;
-    private double dr;    
+    // private double dr;    
     private int t;
     private double maxVelocity;
     private double maxTime;
@@ -92,7 +92,7 @@ public class SplineTrajectory extends CommandBase {
         x5 = (tIndex >= 1) ? parameterizedSpline.get(tIndex - tIncrement).poseMeters.getX() : parameterizedSpline.get(tIndex).poseMeters.getX();
         dy = (((y4 - y3) + (y5 - y4)) / 2.0);//* outputScalar;
         dx = (((x4 - x3) + (x5 - x4)) / 2.0);//* outputScalar;
-        dr = parameterizedSpline.get(tIndex).curvatureRadPerMeter;
+        // dr = parameterizedSpline.get(tIndex).curvatureRadPerMeter;
         drivetrain.drive(new ChassisSpeeds(dx, dy, 0)); 
         //TODO: plug in dr
         //but we should verify dx and dy first

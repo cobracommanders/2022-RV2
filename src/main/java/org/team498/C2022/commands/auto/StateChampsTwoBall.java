@@ -5,21 +5,20 @@ import org.team498.C2022.commands.centerer.SetCenterer;
 import org.team498.C2022.commands.drivetrain.LimelightAlign;
 import org.team498.C2022.commands.drivetrain.RotatingLinearTrajectory;
 import org.team498.C2022.commands.hood.CalibrateHood;
-import org.team498.C2022.commands.hopper.IntakeHopper;
 import org.team498.C2022.commands.hopper.SetHopper;
 import org.team498.C2022.commands.intake.SetIntake;
 import org.team498.C2022.commands.shooter.InterpolateShooter;
 import org.team498.C2022.commands.wrist.SetWrist;
 import org.team498.C2022.subsystems.Centerer;
+import org.team498.C2022.subsystems.Centerer.CentererState;
 import org.team498.C2022.subsystems.Drivetrain;
 import org.team498.C2022.subsystems.Hood;
 import org.team498.C2022.subsystems.Hopper;
+import org.team498.C2022.subsystems.Hopper.HopperSetting;
 import org.team498.C2022.subsystems.Intake;
+import org.team498.C2022.subsystems.Intake.IntakeState;
 import org.team498.C2022.subsystems.Shooter;
 import org.team498.C2022.subsystems.Wrist;
-import org.team498.C2022.subsystems.Centerer.CentererState;
-import org.team498.C2022.subsystems.Hopper.HopperSetting;
-import org.team498.C2022.subsystems.Intake.IntakeState;
 import org.team498.C2022.subsystems.Wrist.WristState;
 import org.team498.lib.drivers.Limelight;
 
@@ -30,8 +29,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class StateChampsTwoBall extends SequentialCommandGroup {
 	public StateChampsTwoBall(Drivetrain drivetrain, Hood hood, Shooter shooter, Hopper hopper, Intake intake,
 			Wrist wrist, Centerer centerer, Limelight limelight) {
-		InterpolateShooter shootCommand = new InterpolateShooter(shooter, hood);
-		IntakeHopper hopperCommand = new IntakeHopper(hopper, shooter, centerer);
 
 		addCommands(
 				// Setup

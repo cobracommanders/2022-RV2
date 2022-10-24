@@ -13,18 +13,14 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import org.team498.lib.drivers.Limelight;
 import org.team498.lib.util.LinearInterpolator;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
 	private final TalonFX leftMotor = new TalonFX(kFrontShooterID);
 	private final TalonFX rightMotor = new TalonFX(kBackShooterID);
-	private final PIDController PID = new PIDController(0.00006, 0, 0);
 	private final LinearInterpolator interpolator = new LinearInterpolator(shooterRPMTable);
 	public final Limelight limelight;
-
-	private ShooterSetting currentSetting = ShooterSetting.IDLE;
 
 	public enum ShooterSetting {
 		FENDER(2000, 0.1),

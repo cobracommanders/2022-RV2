@@ -19,7 +19,6 @@ public class RotatingLinearTrajectory extends CommandBase {
 
 	private final double kMaxSpeed = 3;
 	private final double kAcceptedRange = 2;
-	private final double kP;
 
 	/**
 	 * @apiNote t is zero at x = 0 and y = 0
@@ -39,7 +38,6 @@ public class RotatingLinearTrajectory extends CommandBase {
 		addRequirements(this.drivetrain);
 		drivetrain.zeroGyro();
 
-		kP = kMaxSpeed / 180;
 	}
 
 	@Override
