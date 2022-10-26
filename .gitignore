@@ -42,11 +42,6 @@
 # Log files
 *.log
 
-# Custom log file for the robot
-*.rlog
-# Log file directory
-\logs
-
 # BlueJ files
 *.ctxt
 
