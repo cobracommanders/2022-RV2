@@ -33,13 +33,12 @@ public class Hood extends SubsystemBase {
 		encoder = motor.getEncoder();
 		motor.setSmartCurrentLimit(20);
 		encoder.setPosition(0);
-		PID = new PIDController(0.1, 0, 0.0035); // P = 0.1 I = 0.0 D = 0.004
+		PID = new PIDController(0.1, 0, 0); // P = 0.1 I = 0.0 D = 0.0035
 		limit = new DigitalInput(kHoodLimitDIO);
 		motor.setIdleMode(IdleMode.kBrake);
 		this.limelight = limelight;
 
 		motor.setSoftLimit(SoftLimitDirection.kForward, 26F);
-
 		motor.enableSoftLimit(SoftLimitDirection.kForward, true);
 	}
 
