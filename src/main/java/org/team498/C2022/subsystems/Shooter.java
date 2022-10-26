@@ -14,6 +14,7 @@ import org.team498.lib.drivers.Limelight;
 import org.team498.lib.util.Falcon500Conversions;
 import org.team498.lib.util.LinearInterpolator;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -46,10 +47,11 @@ public class Shooter extends SubsystemBase {
 		leftMotor.configVoltageCompSaturation(8);
 		leftMotor.enableVoltageCompensation(true);
 
-		leftMotor.config_kP(0, 0.5, 30);
+		// leftMotor.config_kP(0, 0.5, 30);
+		leftMotor.config_kP(0, 0.14749, 30);
 		leftMotor.config_kI(0, 0.0, 30);
-		leftMotor.config_kD(0, 0.03, 30);
-		leftMotor.config_kF(0, 0.048, 30);
+		leftMotor.config_kD(0, 0, 30);
+		leftMotor.config_kF(0, 0.12083, 30);
 
 		rightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 30);
 		rightMotor.setNeutralMode(NeutralMode.Coast);
@@ -86,8 +88,10 @@ public class Shooter extends SubsystemBase {
 			leftMotor.neutralOutput();
 		}
 
-		// SmartDashboard.putNumber("Actual RPM",
-		// Falcon500Conversions.falconToRPM(leftMotor.getSelectedSensorVelocity(), 1));
+		SmartDashboard.putNumber("Actual RPM",
+				Falcon500Conversions.falconToRPM(leftMotor.getSelectedSensorVelocity(), 1));
+		SmartDashboard.putNumber("setpoint", setpoint);
+
 		// SmartDashboard.putNumber("voltage used", leftMotor.getMotorOutputVoltage());
 	}
 }
