@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C.Port;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hopper extends SubsystemBase {
@@ -48,17 +47,15 @@ public class Hopper extends SubsystemBase {
 
 		// System.out.println(currentState);
 		// System.out.println(queue);
-		SmartDashboard.putBoolean("upper sensor", getUpperSensor());
+		// SmartDashboard.putBoolean("upper sensor", getUpperSensor());
 		// SmartDashboard.putBoolean("correct color", getCargoState() ==
 		// HopperCargoState.CORRECT);
-		SmartDashboard.putString("state", getOperation().toString());
-		SmartDashboard.putData(this);
-		SmartDashboard.putNumber("red", colorSensor.getRed());
-		SmartDashboard.putNumber("blue", colorSensor.getBlue());
+		// SmartDashboard.putString("state", getOperation().toString());
+		// SmartDashboard.putData(this);
+		// SmartDashboard.putNumber("red", colorSensor.getRed());
+		// SmartDashboard.putNumber("blue", colorSensor.getBlue());
 		// SmartDashboard.putString("alliance", alliance.toString());
-		SmartDashboard.putBoolean("hopper enabled", autoEnabled);
-		SmartDashboard.putBoolean("lower sensor", getLowerSensor());
-
+		// SmartDashboard.putBoolean("lower sensor", getLowerSensor());
 	}
 
 	public enum HopperSetting {

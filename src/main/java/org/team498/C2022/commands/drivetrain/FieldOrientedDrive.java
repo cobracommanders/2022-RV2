@@ -1,5 +1,6 @@
 package org.team498.C2022.commands.drivetrain;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -51,8 +52,8 @@ public class FieldOrientedDrive extends CommandBase {
 				ChassisSpeeds.fromFieldRelativeSpeeds(
 						deadzone(((xTranslation * driveSpeed) * (xTranslation * driveSpeed)) * xTranslation, deadzone),
 						deadzone(((yTranslation * driveSpeed) * (yTranslation * driveSpeed)) * yTranslation, deadzone),
-						deadzone(((rotation * driveSpeed) * (rotation * driveSpeed)) * rotation, deadzone),
-						drivetrainSubsystem.getGyroAngle()));
+						deadzone(((rotation * (driveSpeed + (driveSpeed * 0.5))) * (rotation * (driveSpeed + (driveSpeed * 0.5)))) * rotation, deadzone),
+						Rotation2d.fromDegrees(drivetrainSubsystem.getYaw180())));
 	}
 
 	private double deadzone(double input, double deadzone) {

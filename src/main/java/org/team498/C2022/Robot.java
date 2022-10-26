@@ -3,7 +3,6 @@ package org.team498.C2022;
 import org.team498.C2022.subsystems.Hopper;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -16,12 +15,10 @@ public class Robot extends TimedRobot {
 
 		robotContainer = new RobotContainer();
 		robotContainer.getRobotInitCommand().schedule();
-		SmartDashboard.putNumber("Auto Shoot Delay", 4);
-		SmartDashboard.putNumber("Auto Drive Delay", 8);
 
-		SmartDashboard.putNumber("T-Shooter RPM", 0);
-		SmartDashboard.putNumber("T-Hood angle", 0);
-		SmartDashboard.putNumber("T-limelight distance", 0);
+		// SmartDashboard.putNumber("T-Shooter RPM", 0);
+		// SmartDashboard.putNumber("T-Hood angle", 0);
+		// SmartDashboard.putNumber("T-limelight distance", 0);
 	}
 
 	@Override

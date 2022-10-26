@@ -7,15 +7,13 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
 import org.team498.lib.drivers.Limelight;
 import org.team498.lib.util.LinearInterpolator;
 
-import com.revrobotics.RelativeEncoder;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hood extends SubsystemBase {
@@ -43,8 +41,6 @@ public class Hood extends SubsystemBase {
 		motor.setSoftLimit(SoftLimitDirection.kForward, 26F);
 
 		motor.enableSoftLimit(SoftLimitDirection.kForward, true);
-
-		// SmartDashboard.putNumber("Hood Angle", 0);
 	}
 
 	public enum ControlMode {
@@ -84,9 +80,7 @@ public class Hood extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// POSITIVE VALUES LOWER THE HOOD
 		double power = PID.calculate(encoder.getPosition());
-		SmartDashboard.putNumber("PID Reading", power);
 		if (currentControlMode == ControlMode.PID) {
 			if (!(Math.signum(power) == -1 && getLimit())) {
 				motor.set(power);
@@ -94,11 +88,12 @@ public class Hood extends SubsystemBase {
 				motor.set(0);
 			}
 		}
-		SmartDashboard.putBoolean("Hood powered", !(Math.signum(power) == -1 && getLimit()));
-		SmartDashboard.putBoolean("hood limit", getLimit());
-		SmartDashboard.putData(this);
-		SmartDashboard.putNumber("hood encoder", encoder.getPosition());
-		SmartDashboard.putNumber("hood error", PID.getPositionError());
-		SmartDashboard.putString("Control mode", currentControlMode.toString());
+		// SmartDashboard.putBoolean("Hood powered", !(Math.signum(power) == -1 &&
+		// getLimit()));
+		// SmartDashboard.putBoolean("hood limit", getLimit());
+		// SmartDashboard.putData(this);
+		// SmartDashboard.putNumber("hood encoder", encoder.getPosition());
+		// SmartDashboard.putNumber("hood error", PID.getPositionError());
+		// SmartDashboard.putString("Control mode", currentControlMode.toString());
 	}
 }

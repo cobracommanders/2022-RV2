@@ -11,9 +11,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import org.team498.lib.drivers.Limelight;
+import org.team498.lib.util.Falcon500Conversions;
 import org.team498.lib.util.LinearInterpolator;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -60,31 +60,34 @@ public class Shooter extends SubsystemBase {
 		leftMotor.setInverted(false);
 		rightMotor.follow(leftMotor, FollowerType.PercentOutput);
 
-		SmartDashboard.putNumber("Shooter RPM", 0);
 		this.limelight = limelight;
 	}
 
 	public double getInterpolatedValue() {
-		System.out.println(limelight.getDistance());
 		return interpolator.getInterpolatedValue(limelight.getDistance());
 	}
 
 	private double currentSetpoint;
 
 	public boolean atSetpoint(double range) {
-		return Math.abs(currentSetpoint - (leftMotor.getSelectedSensorVelocity() / 2048)) < range
+		return
+		// If the difference between the setpoint and the target is less than the
+		// provided range
+		Math.abs(currentSetpoint - Falcon500Conversions.falconToRPM(leftMotor.getSelectedSensorVelocity(), 1)) < range
+				// And the flywheel isn't off or reversed
 				&& (Math.signum(currentSetpoint) != -1 && Math.signum(currentSetpoint) != 0);
 	}
 
 	public void set(double setpoint) {
 		this.currentSetpoint = setpoint;
 		if (setpoint != 0) {
-			leftMotor.set(ControlMode.Velocity, setpoint / 0.29296875);
+			leftMotor.set(ControlMode.Velocity, Falcon500Conversions.RPMToFalcon(setpoint, 1));
 		} else {
 			leftMotor.neutralOutput();
 		}
 
-		SmartDashboard.putNumber("Actual RPM", leftMotor.getSelectedSensorVelocity() * 0.29296875);
-		SmartDashboard.putNumber("voltage used", leftMotor.getMotorOutputVoltage());
+		// SmartDashboard.putNumber("Actual RPM",
+		// Falcon500Conversions.falconToRPM(leftMotor.getSelectedSensorVelocity(), 1));
+		// SmartDashboard.putNumber("voltage used", leftMotor.getMotorOutputVoltage());
 	}
 }

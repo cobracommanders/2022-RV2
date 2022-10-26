@@ -21,7 +21,7 @@ public class RotateToAngle extends CommandBase {
 
 		kP = kMaxSpeed / 180;
 
-		lastAngle = modifyRange(drivetrain.getGyroAngle().getDegrees());
+		lastAngle = modifyRange(drivetrain.getYaw180());
 	}
 
 	public double modifyRange(double input) {
@@ -33,15 +33,13 @@ public class RotateToAngle extends CommandBase {
 
 	@Override
 	public void execute() {
-		double currentAngle = modifyRange(drivetrain.getGyroAngle().getDegrees());
+		double currentAngle = modifyRange(drivetrain.getYaw180());
 		fakeAngle += (currentAngle - lastAngle);
 		lastAngle = currentAngle;
 
 		double sign = Math.signum(fakeAngle);
 
 		fakeAngle = modifyRange((Math.abs(fakeAngle) % 180) * sign);
-		
-
 
 		double setpoint = (angle - fakeAngle) * kP;
 		drivetrain.drive(new ChassisSpeeds(0, 0, setpoint));

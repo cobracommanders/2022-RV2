@@ -18,6 +18,7 @@ import org.team498.C2022.commands.climber.TuneClimber;
 import org.team498.C2022.commands.drivetrain.FieldOrientedDrive;
 import org.team498.C2022.commands.drivetrain.LimelightAlign;
 import org.team498.C2022.commands.drivetrain.RobotOrientedDrive;
+import org.team498.C2022.commands.drivetrain.XLock;
 import org.team498.C2022.commands.hood.CalibrateHood;
 import org.team498.C2022.commands.hood.SetHood;
 import org.team498.C2022.commands.hopper.IntakeHopper;
@@ -46,6 +47,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -82,7 +84,6 @@ public class RobotContainer {
 		return operatorController.getRawAxis(Axis.kLeftTrigger.value) > 0.3;
 	});
 
-
 	private final Trigger hopperEnabled = new Trigger(() -> hopper.getAutoEnabled());
 	private final Trigger hopperFull = new Trigger(() -> hopper.isFull());
 
@@ -106,6 +107,10 @@ public class RobotContainer {
 
 	private void configureButtonBindings() {
 		new JoystickButton(driverController, Button.kA.value).whenPressed(new ResetGyro(drivetrain));
+
+		new JoystickButton(operatorController, Button.kBack.value)
+				.whenPressed(new InstantCommand(() -> wrist.resetEncoders()));
+		new JoystickButton(operatorController, Button.kLeftStick.value).whileActiveOnce(new XLock(drivetrain));
 
 		new JoystickButton(operatorController, Button.kY.value).whileHeld(new LimelightAlign(drivetrain, limelight));
 
