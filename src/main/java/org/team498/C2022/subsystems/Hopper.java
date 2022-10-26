@@ -59,7 +59,7 @@ public class Hopper extends SubsystemBase {
 	}
 
 	public enum HopperSetting {
-		LOAD(0.25, 0.25),
+		LOAD(0.3, 0.3),
 		INTAKE(0.19, -0.19),
 		UNLOAD(-0.25, -0.25),
 		OUTTAKE(0.4, -0.4),
