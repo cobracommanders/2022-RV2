@@ -15,7 +15,7 @@ import org.team498.C2022.commands.auto.StateChampsTwoBall;
 import org.team498.C2022.commands.centerer.ToggleCenterer;
 import org.team498.C2022.commands.climber.SetClimber;
 import org.team498.C2022.commands.climber.TuneClimber;
-import org.team498.C2022.commands.drivetrain.FieldOrientedDrive;
+import org.team498.C2022.commands.drivetrain.FieldOrientedDriveRotate;
 import org.team498.C2022.commands.drivetrain.LimelightAlign;
 import org.team498.C2022.commands.drivetrain.RobotOrientedDrive;
 import org.team498.C2022.commands.drivetrain.XLock;
@@ -91,18 +91,20 @@ public class RobotContainer {
 		configureButtonBindings();
 
 		drivetrain.setDefaultCommand(
-				new FieldOrientedDrive(
+				new FieldOrientedDriveRotate(
 						drivetrain,
 						// Forwards/backwards translation
-						() -> -driverController.getLeftY(),
+						() -> -driverController.getRightY(),
 						// Left/right translation
-						() -> -driverController.getLeftX(),
-						// Rotation
 						() -> -driverController.getRightX(),
+						// Rotation
+						() -> -driverController.getLeftX(),
 						// Deadzone
 						0.1,
 						// Slow speed
-						() -> driverController.getRawButton(Button.kLeftBumper.value)));
+						() -> driverController.getRawButton(Button.kLeftBumper.value),
+						// Center of rotation
+						() -> driverController.getPOV()));
 	}
 
 	private void configureButtonBindings() {
@@ -110,7 +112,8 @@ public class RobotContainer {
 
 		new JoystickButton(operatorController, Button.kBack.value)
 				.whenPressed(new InstantCommand(() -> wrist.resetEncoders()));
-		new JoystickButton(operatorController, Button.kLeftStick.value).whileActiveOnce(new XLock(drivetrain));
+
+		new JoystickButton(driverController, Button.kY.value).whileActiveOnce(new XLock(drivetrain));
 
 		new JoystickButton(operatorController, Button.kY.value).whileHeld(new LimelightAlign(drivetrain, limelight));
 
@@ -140,11 +143,11 @@ public class RobotContainer {
 				new RobotOrientedDrive(
 						drivetrain,
 						// Forwards/backwards translation
-						() -> -driverController.getLeftY(),
+						() -> -driverController.getRightY(),
 						// Left/right translation
-						() -> -driverController.getLeftX(),
-						// Rotation
 						() -> -driverController.getRightX(),
+						// Rotation
+						() -> -driverController.getLeftX(),
 						// Deadzone
 						0.1,
 						// Slow speed
