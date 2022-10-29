@@ -3,6 +3,7 @@ package org.team498.C2022;
 import static org.team498.C2022.Constants.LimelightConstants.kLimelightLensHeight;
 import static org.team498.C2022.Constants.LimelightConstants.kLimelightMountAngle;
 import static org.team498.C2022.Constants.LimelightConstants.kVisionTapeHeight;
+import static org.team498.C2022.Constants.OIConstants.kControllerRumbleRange;
 import static org.team498.C2022.Constants.OIConstants.kDriverControllerID;
 import static org.team498.C2022.Constants.OIConstants.kOperatorControllerID;
 
@@ -23,7 +24,6 @@ import org.team498.C2022.commands.drivetrain.XLock;
 import org.team498.C2022.commands.hood.CalibrateHood;
 import org.team498.C2022.commands.hood.SetHood;
 import org.team498.C2022.commands.hopper.IntakeHopper;
-import org.team498.C2022.commands.hopper.ShootCargo;
 import org.team498.C2022.commands.hopper.ToggleAutoHopper;
 import org.team498.C2022.commands.hopper.ToggleHopper;
 import org.team498.C2022.commands.intake.ToggleIntake;
@@ -106,8 +106,12 @@ public class RobotContainer {
 		final Trigger climberDown = new Trigger(() -> operatorController.getRawAxis(Axis.kLeftTrigger.value) > 0.3);
 		final Trigger hopperEnabled = new Trigger(() -> hopper.getAutoEnabled());
 		final Trigger hopperFull = new Trigger(() -> hopper.isFull());
+		final Trigger flywheelAtSpeed = new Trigger(() -> shooter.atSetpoint(kControllerRumbleRange));
 
 		/* DRIVER CONTROLLER */
+		new JoystickButton(driverController, Button.kY.value)
+				.whileActiveOnce(new XLock(drivetrain));
+
 		new JoystickButton(driverController, Button.kA.value)
 				.whenPressed(new ResetGyro(drivetrain));
 
@@ -115,8 +119,9 @@ public class RobotContainer {
 				.toggleWhenActive(new LimelightTestingSetup(shooter, hood, limelight));
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
-				// .whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
-				.whenActive(new ShootCargo(hopper));
+				.and(flywheelAtSpeed)
+				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
+		// .whenActive(new ShootCargo(hopper));
 
 		new JoystickButton(driverController, Button.kB.value).toggleWhenPressed(
 				new RobotOrientedDrive(
@@ -157,9 +162,6 @@ public class RobotContainer {
 				);
 
 		/* OPERATOR CONTROLLER */
-		new JoystickButton(operatorController, Button.kLeftStick.value)
-				.whileActiveOnce(new XLock(drivetrain));
-
 		new JoystickButton(operatorController, Button.kY.value)
 				.whileHeld(new LimelightAlign(drivetrain, limelight));
 
@@ -229,6 +231,7 @@ public class RobotContainer {
 		final Trigger climberDown = new Trigger(() -> operatorController.getRawAxis(Axis.kLeftTrigger.value) > 0.3);
 		final Trigger hopperEnabled = new Trigger(() -> hopper.getAutoEnabled());
 		final Trigger hopperFull = new Trigger(() -> hopper.isFull());
+		final Trigger flywheelAtSpeed = new Trigger(() -> shooter.atSetpoint(kControllerRumbleRange));
 
 		/* DRIVER CONTROLLER */
 		new JoystickButton(driverController, Button.kA.value)
@@ -241,8 +244,9 @@ public class RobotContainer {
 				.toggleWhenActive(new LimelightTestingSetup(shooter, hood, limelight));
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
-				// .whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
-				.whenActive(new ShootCargo(hopper));
+				.and(flywheelAtSpeed)
+				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
+		// .whenActive(new ShootCargo(hopper));
 
 		new JoystickButton(driverController, Button.kB.value).toggleWhenPressed(
 				new RobotOrientedDrive(

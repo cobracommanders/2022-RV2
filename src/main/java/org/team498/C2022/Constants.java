@@ -42,7 +42,7 @@ public final class Constants {
 	public static final class OIConstants {
 		public static final int kDriverControllerID = 0;
 		public static final int kOperatorControllerID = 1;
-		public static final double kControllerRumbleRange = 1000;
+		public static final double kControllerRumbleRange = 150;
 	}
 
 	public static final class LimelightConstants {
