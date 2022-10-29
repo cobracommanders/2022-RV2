@@ -20,8 +20,8 @@ public class Wrist extends SubsystemBase {
 	private WristState currentState = WristState.IN;
 
 	public enum WristState {
-		IN(kPositionIn, 0.14, 0.1),
-		OUT(kPositionOut, 0.2, 1.5);
+		IN(kPositionIn, 0.14, 0.05),
+		OUT(kPositionOut, 0.14, 1);
 
 		private double position;
 		private double kP;
