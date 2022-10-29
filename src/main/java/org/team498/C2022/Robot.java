@@ -13,12 +13,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void robotInit() {
-		robotContainer = new RobotContainer(ControlSet.FANCY);
+		robotContainer = new RobotContainer(ControlSet.STANDARD);
 		robotContainer.getRobotInitCommand().schedule();
-
-		// SmartDashboard.putNumber("T-Shooter RPM", 0);
-		// SmartDashboard.putNumber("T-Hood angle", 0);
-		// SmartDashboard.putNumber("T-limelight distance", 0);
 	}
 
 	@Override
