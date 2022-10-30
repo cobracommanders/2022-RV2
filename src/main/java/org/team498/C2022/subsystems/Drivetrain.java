@@ -184,6 +184,15 @@ public class Drivetrain extends SubsystemBase {
 		};
 	}
 
+	public double getSpeedX() {
+		ChassisSpeeds speed = kinematics.toChassisSpeeds(getModuleStates());
+		return speed.vxMetersPerSecond;
+	}
+	public double getSpeedY() {
+		ChassisSpeeds speed = kinematics.toChassisSpeeds(getModuleStates());
+		return speed.vyMetersPerSecond;
+	}
+
 	public boolean isMoving() {
 		ChassisSpeeds speed = kinematics.toChassisSpeeds(getModuleStates());
 		return ((Math.abs(speed.vxMetersPerSecond) + Math.abs(speed.vyMetersPerSecond)

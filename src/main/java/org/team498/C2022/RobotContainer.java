@@ -12,7 +12,7 @@ import org.team498.C2022.commands.LimelightTestingSetup;
 import org.team498.C2022.commands.ResetGyro;
 import org.team498.C2022.commands.RumbleControllerLeft;
 import org.team498.C2022.commands.RumbleControllerRight;
-import org.team498.C2022.commands.auto.StateChampsTwoBall;
+import org.team498.C2022.commands.auto.ThreeBall;
 import org.team498.C2022.commands.centerer.ToggleCenterer;
 import org.team498.C2022.commands.climber.SetClimber;
 import org.team498.C2022.commands.climber.TuneClimber;
@@ -116,7 +116,7 @@ public class RobotContainer {
 				.whenPressed(new ResetGyro(drivetrain));
 
 		new JoystickButton(driverController, Button.kStart.value)
-				.toggleWhenActive(new LimelightTestingSetup(shooter, hood, limelight));
+				.toggleWhenActive(new LimelightTestingSetup(shooter, hood));
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
 				.and(flywheelAtSpeed)
@@ -172,13 +172,19 @@ public class RobotContainer {
 				.whenPressed(new ToggleAutoHopper(hopper));
 
 		new JoystickButton(operatorController, Button.kX.value)
-				.toggleWhenActive(new ParallelCommandGroup(
-						new InterpolateShooter(shooter, hood),
-						new RumbleControllerLeft(operatorController, 1)));
+				.toggleWhenPressed(new ParallelCommandGroup(
+					//new SetShooter(shooter, shooter.getInterpolatedValue()),
+					//new HoodCommand(hood, hood.getInterpolatedValue())
+						// new InstantCommand(() -> shooter.set(shooter.getInterpolatedValue()), shooter),
+						// new InstantCommand(() -> hood.setAngle(hood.getInterpolatedValue()), hood)
+						new InterpolateShooter(shooter, hood)
+				));
+				//.whenInactive(new InstantCommand(()-> shooter.set(0), shooter));
+						//new RumbleControllerLeft(operatorController, 1)));
 
 		new JoystickButton(operatorController, Button.kA.value)
 				.toggleWhenActive(new ParallelCommandGroup(
-						new SetShooter(shooter, 2000),
+						new SetShooter(shooter, 1800),
 						new SetHood(hood, 0),
 						new RumbleControllerLeft(operatorController, 1)));
 
@@ -241,7 +247,7 @@ public class RobotContainer {
 				.whileActiveOnce(new XLock(drivetrain));
 
 		new JoystickButton(driverController, Button.kStart.value)
-				.toggleWhenActive(new LimelightTestingSetup(shooter, hood, limelight));
+				.toggleWhenActive(new LimelightTestingSetup(shooter, hood));
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
 				.and(flywheelAtSpeed)
@@ -347,7 +353,9 @@ public class RobotContainer {
 	}
 
 	public Command getAutoCommand() {
-		return new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
+		return 
+		
+		new ThreeBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
 	}
 
 	public Command getRobotInitCommand() {

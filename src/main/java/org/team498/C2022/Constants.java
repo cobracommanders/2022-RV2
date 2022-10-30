@@ -1,5 +1,7 @@
 package org.team498.C2022;
 
+import edu.wpi.first.math.util.Units;
+
 public final class Constants {
 	public static final class HopperConstants {
 		public static final int kFrontHopperID = 20;
@@ -64,13 +66,12 @@ public final class Constants {
 
 	public static final class DrivetrainConstants {
 		// This is just copied from SDS, we need to find the real one still
-		/*
-		 * public static final double kMaxVelocityMetersPerSecond = 6380.0 / 60.0 *
-		 * ((14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0)) * kDriveWheelDiameter *
-		 * Math.PI;
-		 */
 
-		public static final double kMaxVelocityMetersPerSecond = 2;
+		public static final double kMaxVelocityMetersPerSecond = 6380.0 / 60.0 *
+				((14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0)) * Units.inchesToMeters(4) *
+				Math.PI;
+
+		// public static final double kMaxVelocityMetersPerSecond = 2;
 
 		public static final double kSwerveModuleDistanceFromCenter = 10.75;
 

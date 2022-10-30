@@ -7,6 +7,7 @@ import static org.team498.C2022.Constants.DrivetrainConstants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -72,6 +73,11 @@ public class SwerveModule extends SubsystemBase {
 
 		// Set the encoder to return values from 0 to 360 instead of -180 to +180
 		encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+
+		// Drive current limit: 35
+		// Steer current limit: 20
+		// driveMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 35, 40, .5));
+		// steerMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 20, 40, .5));
 
 		this.angleOffset = angleOffset;
 		this.lastAngle = getState().angle.getDegrees();

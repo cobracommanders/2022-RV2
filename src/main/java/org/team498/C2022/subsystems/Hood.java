@@ -14,6 +14,7 @@ import org.team498.lib.util.LinearInterpolator;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hood extends SubsystemBase {
@@ -52,6 +53,7 @@ public class Hood extends SubsystemBase {
 	}
 
 	public void setAngle(double angle) {
+		setState(ControlMode.PID);
 		// Makes it so that the given angle is a number from 0 (low) to 1 (high)
 		PID.setSetpoint(angle * 26);
 		// PID1.setReference(angle, ControlType.kPosition);
@@ -91,8 +93,12 @@ public class Hood extends SubsystemBase {
 		// getLimit()));
 		// SmartDashboard.putBoolean("hood limit", getLimit());
 		// SmartDashboard.putData(this);
-		// SmartDashboard.putNumber("hood encoder", encoder.getPosition());
-		// SmartDashboard.putNumber("hood error", PID.getPositionError());
+		SmartDashboard.putNumber("hood encoder", encoder.getPosition());
+		SmartDashboard.putNumber("hood setpoint", PID.getSetpoint());
+		SmartDashboard.putNumber("Hood Interpolated value", getInterpolatedValue());
+		SmartDashboard.putNumber("T-limelight distance", limelight.getDistance());
+		// SmartDashboard.putNumber("hood error",
+		// PID.getPositionError());
 		// SmartDashboard.putString("Control mode", currentControlMode.toString());
 	}
 }
