@@ -1,7 +1,6 @@
 package org.team498.C2022.subsystems;
 
 import static org.team498.C2022.Constants.HopperConstants.kBackHopperID;
-import static org.team498.C2022.Constants.HopperConstants.kColorSensorLeniency;
 import static org.team498.C2022.Constants.HopperConstants.kFrontHopperID;
 import static org.team498.C2022.Constants.HopperConstants.kLowerSensorDIO;
 import static org.team498.C2022.Constants.HopperConstants.kUpperSensorDIO;
@@ -60,7 +59,7 @@ public class Hopper extends SubsystemBase {
 	}
 
 	public enum HopperSetting {
-		LOAD(0.3, 0.3),
+		LOAD(.3, .3),
 		INTAKE(0.19, -0.19),
 		UNLOAD(-0.25, -0.25),
 		OUTTAKE(0.4, -0.4),
@@ -90,19 +89,27 @@ public class Hopper extends SubsystemBase {
 		// If there is a cargo in the bottom of the hopper and the color sensor hasn't
 		// read it yet, or if there is a cargo in the top of the hopper and a correct
 		// cargo is in the botom of the hopper, return IDLE to stop the hopper
-		if ((getLowerSensor() && currentCargo == HopperState.EMPTY)
-				|| (getUpperSensor() && currentCargo == HopperState.CORRECT))
+		// if ((getLowerSensor() && currentCargo == HopperState.EMPTY)
+		// || (getUpperSensor() && currentCargo == HopperState.CORRECT))
+		// return HopperState.IDLE;
+		// // Else, return the value provided by the color sensor
+		// return currentCargo;
+
+		if ((getUpperSensor() && (currentCargo == HopperState.CORRECT && getLowerSensor())))
 			return HopperState.IDLE;
 		// Else, return the value provided by the color sensor
-		return currentCargo;
+		if (getLowerSensor())
+			return currentCargo;
+
+		return HopperState.EMPTY;
 	}
 
 	public HopperState getColorSensor() {
 		// If neither color sensor is detecting a value signifigant enough to singal the
 		// presense of a cargo, return EMPTY
-		if (!((colorSensor.getBlue() > kColorSensorLeniency)
-				|| (colorSensor.getRed() > kColorSensorLeniency)))
-			return HopperState.EMPTY;
+		// if (!((colorSensor.getBlue() > kColorSensorLeniency)
+		// 		|| (colorSensor.getRed() > kColorSensorLeniency)))
+		// 	return HopperState.EMPTY;
 
 		// If the alliance is blue and the reading from blue is stronger than red, or if
 		// the alliance is red with a stronger reading from red, return CORRECT
@@ -119,7 +126,7 @@ public class Hopper extends SubsystemBase {
 	}
 
 	public boolean isFull() {
-		return getColorSensor() == HopperState.CORRECT && getUpperSensor();
+		return (getColorSensor() == HopperState.CORRECT && getLowerSensor()) && getUpperSensor();
 	}
 
 	public boolean getUpperSensor() {
