@@ -149,11 +149,15 @@ public class Drivetrain extends SubsystemBase {
 		}
 	}
 
-	// Method to set the swerve drive to desired speed of direction and rotation
 	public void drive(ChassisSpeeds chassisSpeeds) {
+		drive(chassisSpeeds, new Translation2d(0, 0));
+	}
+
+	// Method to set the swerve drive to desired speed of direction and rotation
+	public void drive(ChassisSpeeds chassisSpeeds, Translation2d rotation) {
 		// Use the kinematics to set the desired speed and angle for each swerve module
 		// using the input velocities for direction and rotation
-		setModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds), false);
+		setModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds, rotation), false);
 	}
 
 	/**
@@ -178,6 +182,15 @@ public class Drivetrain extends SubsystemBase {
 				backLeft.getState(),
 				backRight.getState()
 		};
+	}
+
+	public double getSpeedX() {
+		ChassisSpeeds speed = kinematics.toChassisSpeeds(getModuleStates());
+		return speed.vxMetersPerSecond;
+	}
+	public double getSpeedY() {
+		ChassisSpeeds speed = kinematics.toChassisSpeeds(getModuleStates());
+		return speed.vyMetersPerSecond;
 	}
 
 	public boolean isMoving() {

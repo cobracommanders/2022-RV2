@@ -15,6 +15,8 @@ public class ToggleAutoHopper extends InstantCommand {
 
 	@Override
 	public void initialize() {
+		if (hopper.getCurrentCommand() != null)
+			hopper.getCurrentCommand().cancel();
 		hopper.setAutoEnabled(!hopper.getAutoEnabled());
 		SmartDashboard.putBoolean("hopper enabled", hopper.getAutoEnabled());
 	}

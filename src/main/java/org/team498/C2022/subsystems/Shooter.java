@@ -47,11 +47,14 @@ public class Shooter extends SubsystemBase {
 		leftMotor.configVoltageCompSaturation(8);
 		leftMotor.enableVoltageCompensation(true);
 
-		// leftMotor.config_kP(0, 0.5, 30);
-		leftMotor.config_kP(0, 0.14749, 30);
+		// leftMotor.config_kP(0, 0.83852, 30);
+		// leftMotor.config_kI(0, 0.0, 30);
+		// leftMotor.config_kD(0, 2, 30);
+		// leftMotor.config_kF(0, 0.12083, 30);
+		leftMotor.config_kP(0, 0.19028, 30);
 		leftMotor.config_kI(0, 0.0, 30);
 		leftMotor.config_kD(0, 0, 30);
-		leftMotor.config_kF(0, 0.12083, 30);
+		leftMotor.config_kF(0, 0.092, 30);
 
 		rightMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 30);
 		rightMotor.setNeutralMode(NeutralMode.Coast);

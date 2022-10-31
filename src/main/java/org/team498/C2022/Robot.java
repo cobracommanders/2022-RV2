@@ -1,5 +1,6 @@
 package org.team498.C2022;
 
+import org.team498.C2022.RobotContainer.ControlSet;
 import org.team498.C2022.subsystems.Hopper;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -12,13 +13,8 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void robotInit() {
-
-		robotContainer = new RobotContainer();
+		robotContainer = new RobotContainer(ControlSet.STANDARD);
 		robotContainer.getRobotInitCommand().schedule();
-
-		// SmartDashboard.putNumber("T-Shooter RPM", 0);
-		// SmartDashboard.putNumber("T-Hood angle", 0);
-		// SmartDashboard.putNumber("T-limelight distance", 0);
 	}
 
 	@Override
