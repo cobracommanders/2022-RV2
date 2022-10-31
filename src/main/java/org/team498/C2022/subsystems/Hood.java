@@ -1,8 +1,7 @@
 package org.team498.C2022.subsystems;
 
 import static org.team498.C2022.Constants.HoodConstants.kHoodLimitDIO;
-import static org.team498.C2022.ShooterTable.hoodAngleTable;
-
+import org.team498.C2022.Tables.ShooterTable;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
@@ -26,7 +25,7 @@ public class Hood extends SubsystemBase {
 	// private final SparkMaxPIDController PID1;
 	private ControlMode currentControlMode = ControlMode.PID;
 	private final Limelight limelight;
-	private LinearInterpolator interpolator = new LinearInterpolator(hoodAngleTable);
+	private LinearInterpolator interpolator = new LinearInterpolator(ShooterTable.hoodAngleTable);
 
 	public Hood(Limelight limelight) {
 		motor = new CANSparkMax(36, MotorType.kBrushless);

@@ -6,12 +6,14 @@ import static org.team498.C2022.Constants.LimelightConstants.kVisionTapeHeight;
 import static org.team498.C2022.Constants.OIConstants.kDriverControllerID;
 import static org.team498.C2022.Constants.OIConstants.kOperatorControllerID;
 
+import org.team498.C2022.Tables.DriveTables;
 import org.team498.C2022.commands.CalibrateGyro;
 import org.team498.C2022.commands.LimelightTestingSetup;
 import org.team498.C2022.commands.ResetGyro;
 import org.team498.C2022.commands.RumbleControllerLeft;
 import org.team498.C2022.commands.RumbleControllerRight;
 import org.team498.C2022.commands.auto.StateChampsTwoBall;
+import org.team498.C2022.commands.auto.TableFollower;
 import org.team498.C2022.commands.centerer.ToggleCenterer;
 import org.team498.C2022.commands.climber.SetClimber;
 import org.team498.C2022.commands.climber.TuneClimber;
@@ -40,6 +42,7 @@ import org.team498.C2022.subsystems.Shooter;
 import org.team498.C2022.subsystems.Shooter.ShooterSetting;
 import org.team498.C2022.subsystems.Wrist;
 import org.team498.C2022.subsystems.Wrist.WristState;
+import org.team498.app.ControllerApp;
 import org.team498.lib.drivers.Limelight;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -185,6 +188,9 @@ public class RobotContainer {
 				.whileActiveOnce(new ToggleHopper(hopper, HopperSetting.OUTTAKETOP))
 				.whenInactive(new SetShooter(shooter, 0));
 
+		new JoystickButton(operatorController, Button.kStart.value)
+			.toggleWhenActive(new ControllerApp(driverController, "trajectory1.csv"));
+			//TODO: Test the input recorder
 		new JoystickButton(driverController, Button.kRightBumper.value)
 				// .and(flywheelAtSpeed)
 				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
@@ -234,7 +240,9 @@ public class RobotContainer {
 	}
 
 	public Command getAutoCommand() {
-		return new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
+		return 
+		new TableFollower(drivetrain, DriveTables.trajectory1);
+		//new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
 	}
 
 	public Command getRobotInitCommand() {

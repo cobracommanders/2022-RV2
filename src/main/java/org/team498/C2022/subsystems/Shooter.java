@@ -2,8 +2,8 @@ package org.team498.C2022.subsystems;
 
 import static org.team498.C2022.Constants.ShooterConstants.kBackShooterID;
 import static org.team498.C2022.Constants.ShooterConstants.kFrontShooterID;
-import static org.team498.C2022.ShooterTable.shooterRPMTable;
 
+import org.team498.C2022.Tables.ShooterTable;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.FollowerType;
@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Shooter extends SubsystemBase {
 	private final TalonFX leftMotor = new TalonFX(kFrontShooterID);
 	private final TalonFX rightMotor = new TalonFX(kBackShooterID);
-	private final LinearInterpolator interpolator = new LinearInterpolator(shooterRPMTable);
+	private final LinearInterpolator interpolator = new LinearInterpolator(ShooterTable.shooterRPMTable);
 	public final Limelight limelight;
 
 	public enum ShooterSetting {
