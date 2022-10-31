@@ -10,18 +10,19 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Wrist extends SubsystemBase {
 	private final CANSparkMax leftMotor = new CANSparkMax(kLeftWristID, MotorType.kBrushless);
 	private final CANSparkMax rightMotor = new CANSparkMax(kRightWristID, MotorType.kBrushless);
-	private final RelativeEncoder encoder = leftMotor.getEncoder();
+	private final RelativeEncoder encoder = rightMotor.getEncoder();
 
 	private WristState currentState = WristState.IN;
 
 	public enum WristState {
-		IN(kPositionIn, 0.14, 0.1),
-		OUT(kPositionOut, 0.2, 1.5);
+		IN(kPositionIn, 0.17, 0.1),
+		OUT(kPositionOut, 0.14, 1);
 
 		private double position;
 		private double kP;
@@ -36,16 +37,25 @@ public class Wrist extends SubsystemBase {
 
 	public Wrist() {
 		leftMotor.setIdleMode(IdleMode.kBrake);
-		rightMotor.setIdleMode(IdleMode.kBrake);
 		leftMotor.setInverted(false);
 		leftMotor.setOpenLoopRampRate(0.25);
-		rightMotor.follow(leftMotor, true);
+
+		rightMotor.setIdleMode(IdleMode.kBrake);
+		rightMotor.setInverted(true);
+		rightMotor.setOpenLoopRampRate(0.25);
+		encoder.setPosition(0);
+	}
+
+	public void resetEncoders() {
 		encoder.setPosition(0);
 	}
 
 	@Override
 	public void periodic() {
+		System.out.println(calculate(currentState.position, encoder.getPosition()));
 		leftMotor.set(calculate(currentState.position, encoder.getPosition()));
+		rightMotor.set(calculate(currentState.position, encoder.getPosition()));
+		SmartDashboard.putNumber("wrist encoder", encoder.getPosition());
 	}
 
 	public void setState(WristState state) {

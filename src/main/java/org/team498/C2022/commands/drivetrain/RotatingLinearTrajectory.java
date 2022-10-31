@@ -2,6 +2,7 @@ package org.team498.C2022.commands.drivetrain;
 
 import org.team498.C2022.subsystems.Drivetrain;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -50,13 +51,13 @@ public class RotatingLinearTrajectory extends CommandBase {
 	public void execute() {
 		double time = getTimerCountdown();
 
-		double rotationSpeed = (-drivetrain.IMUAngle() - rps) * -0.01666;
+		double rotationSpeed = (-drivetrain.getYaw() - rps) * -0.01666;
 
 		drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(
 				time < Math.abs(xScalar) * kSlowDownPrecentage ? xScalar * time : xScalar,
 				time < Math.abs(yScalar) * kSlowDownPrecentage ? yScalar * time : yScalar,
 				clampBelow(rotationSpeed + Math.copySign(0.5, rotationSpeed), kMaxSpeed),
-				drivetrain.getGyroAngle()));
+				Rotation2d.fromDegrees(drivetrain.getYaw180())));
 	}
 
 	@Override
@@ -68,7 +69,7 @@ public class RotatingLinearTrajectory extends CommandBase {
 
 	@Override
 	public boolean isFinished() {
-		return timer.get() > seconds && Math.abs(-drivetrain.IMUAngle() - rps) < kAcceptedRange;
+		return timer.get() > seconds && Math.abs(-drivetrain.getYaw() - rps) < kAcceptedRange;
 	}
 
 	private double getTimerCountdown() {

@@ -3,6 +3,7 @@ package org.team498.C2022;
 import static org.team498.C2022.Constants.LimelightConstants.kLimelightLensHeight;
 import static org.team498.C2022.Constants.LimelightConstants.kLimelightMountAngle;
 import static org.team498.C2022.Constants.LimelightConstants.kVisionTapeHeight;
+import static org.team498.C2022.Constants.OIConstants.kControllerRumbleRange;
 import static org.team498.C2022.Constants.OIConstants.kDriverControllerID;
 import static org.team498.C2022.Constants.OIConstants.kOperatorControllerID;
 
@@ -11,13 +12,15 @@ import org.team498.C2022.commands.LimelightTestingSetup;
 import org.team498.C2022.commands.ResetGyro;
 import org.team498.C2022.commands.RumbleControllerLeft;
 import org.team498.C2022.commands.RumbleControllerRight;
-import org.team498.C2022.commands.auto.StateChampsTwoBall;
+import org.team498.C2022.commands.auto.ThreeBall;
 import org.team498.C2022.commands.centerer.ToggleCenterer;
 import org.team498.C2022.commands.climber.SetClimber;
 import org.team498.C2022.commands.climber.TuneClimber;
 import org.team498.C2022.commands.drivetrain.FieldOrientedDrive;
+import org.team498.C2022.commands.drivetrain.FieldOrientedDriveRotate;
 import org.team498.C2022.commands.drivetrain.LimelightAlign;
 import org.team498.C2022.commands.drivetrain.RobotOrientedDrive;
+import org.team498.C2022.commands.drivetrain.XLock;
 import org.team498.C2022.commands.hood.CalibrateHood;
 import org.team498.C2022.commands.hood.SetHood;
 import org.team498.C2022.commands.hopper.IntakeHopper;
@@ -46,9 +49,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -66,135 +70,240 @@ public class RobotContainer {
 	private final XboxController driverController = new XboxController(kDriverControllerID);
 	private final XboxController operatorController = new XboxController(kOperatorControllerID);
 
-	private final Trigger intakeButton = new Trigger(() -> {
-		return driverController.getRawAxis(Axis.kRightTrigger.value) > 0.3;
-	});
-
-	private final Trigger outtakeFrontButton = new Trigger(() -> {
-		return driverController.getRawAxis(Axis.kLeftTrigger.value) > 0.3;
-	});
-
-	private final Trigger climberUp = new Trigger(() -> {
-		return operatorController.getRawAxis(Axis.kRightTrigger.value) > 0.3;
-	});
-
-	private final Trigger climberDown = new Trigger(() -> {
-		return operatorController.getRawAxis(Axis.kLeftTrigger.value) > 0.3;
-	});
-
-
-	private final Trigger hopperEnabled = new Trigger(() -> hopper.getAutoEnabled());
-	private final Trigger hopperFull = new Trigger(() -> hopper.isFull());
-
-	public RobotContainer() {
-		configureButtonBindings();
-
-		drivetrain.setDefaultCommand(
-				new FieldOrientedDrive(
-						drivetrain,
-						// Forwards/backwards translation
-						() -> -driverController.getLeftY(),
-						// Left/right translation
-						() -> -driverController.getLeftX(),
-						// Rotation
-						() -> -driverController.getRightX(),
-						// Deadzone
-						0.1,
-						// Slow speed
-						() -> driverController.getRawButton(Button.kLeftBumper.value)));
+	public enum ControlSet {
+		STANDARD,
+		FANCY
 	}
 
-	private void configureButtonBindings() {
-		new JoystickButton(driverController, Button.kA.value).whenPressed(new ResetGyro(drivetrain));
+	public RobotContainer(ControlSet controls) {
+		setControls(controls);
+	}
 
-		new JoystickButton(operatorController, Button.kY.value).whileHeld(new LimelightAlign(drivetrain, limelight));
+	public void setControls(ControlSet controls) {
+		CommandScheduler.getInstance().clearButtons();
+		switch (controls) {
+			case STANDARD:
+				configureButtonBindingsStandard();
+				break;
 
-		new JoystickButton(driverController, Button.kBack.value).whenPressed(new SequentialCommandGroup(
-				// new ParabolicTrajectory(drivetrain, 1, 1, 0, 0, 1);
-				// new LinearTrajectory(drivetrain, 2, 2, 0, 1),
-				// new LinearTrajectory(drivetrain, 2, -2, 0, 2),
-				// new LinearTrajectory(drivetrain, 0, 2, 0, 2)
+			case FANCY:
+				configureButtonBindingsFancy();
+				break;
 
-				new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight)));
-		// new RotatingLinearTrajectory(drivetrain, 0, 0, 90, 10)));
+			default:
+				configureButtonBindingsStandard();
+				break;
+		}
+	}
 
-		new JoystickButton(driverController, Button.kStart.value).toggleWhenActive(new SequentialCommandGroup(
-				// new ParabolicTrajectory(drivetrain, 1, 1, 0, 0, 1);
-				// new LinearTrajectory(drivetrain, 2, 2, 0, 1),
-				// new LinearTrajectory(drivetrain, 2, -2, 0, 2),
-				// new LinearTrajectory(drivetrain, 0, 2, 0, 2)
+	/**
+	 * Standard driver controls
+	 */
+	private void configureButtonBindingsStandard() {
+		final Trigger intakeButton = new Trigger(() -> driverController.getRawAxis(Axis.kRightTrigger.value) > 0.3);
+		final Trigger outtakeButton = new Trigger(() -> driverController.getRawAxis(Axis.kLeftTrigger.value) > 0.3);
+		final Trigger climberUp = new Trigger(() -> operatorController.getRawAxis(Axis.kRightTrigger.value) > 0.3);
+		final Trigger climberDown = new Trigger(() -> operatorController.getRawAxis(Axis.kLeftTrigger.value) > 0.3);
+		final Trigger hopperEnabled = new Trigger(() -> hopper.getAutoEnabled());
+		final Trigger hopperFull = new Trigger(() -> hopper.isFull());
+		final Trigger flywheelAtSpeed = new Trigger(() -> shooter.atSetpoint(kControllerRumbleRange));
 
-				new LimelightTestingSetup(shooter, hood, limelight)));
+		/* DRIVER CONTROLLER */
+		new JoystickButton(driverController, Button.kY.value)
+				.whileActiveOnce(new XLock(drivetrain));
 
-		// new JoystickButton(driverController, Button.kBack.value).whenPressed(
-		// new SplineTrajectory(drivetrain, new double[] { 0, 0, 0 }, new double[] { 0,
-		// 0, 0 },
-		// new double[] { 1, 0, 0 }, new double[] { 0, 0, 0 }, 1));
+		new JoystickButton(driverController, Button.kA.value)
+				.whenPressed(new ResetGyro(drivetrain));
+
+		new JoystickButton(driverController, Button.kStart.value)
+				.toggleWhenActive(new LimelightTestingSetup(shooter, hood));
+
+		new JoystickButton(driverController, Button.kRightBumper.value)
+				.and(flywheelAtSpeed)
+				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
+		// .whenActive(new ShootCargo(hopper));
 
 		new JoystickButton(driverController, Button.kB.value).toggleWhenPressed(
 				new RobotOrientedDrive(
 						drivetrain,
-						// Forwards/backwards translation
-						() -> -driverController.getLeftY(),
-						// Left/right translation
-						() -> -driverController.getLeftX(),
-						// Rotation
-						() -> -driverController.getRightX(),
-						// Deadzone
-						0.1,
-						// Slow speed
-						() -> driverController.getRawButton(Button.kLeftBumper.value)));
+						() -> -driverController.getRightY(), // Forwards/backwards translation
+						() -> -driverController.getRightX(), // Left/right translation
+						() -> -driverController.getLeftX(), // Rotation
+						0.1, // Deadzone
+						() -> driverController.getRawButton(Button.kLeftBumper.value) // Slow speed
+				));
 
 		intakeButton
-				// Makes the intake retract when we have two cargo
-				.and(hopperFull.negate())
-				// While the button is pressed
-				.whileActiveContinuous(
+				.and(hopperFull.negate()) // Makes the intake retract when we have two cargo
+				.whileActiveContinuous( // While the button is pressed
 						new ParallelCommandGroup(
-								// Start the intake
-								new ToggleIntake(intake, IntakeState.INTAKE),
-								// Start the hopper
-								new SelectCommand(
-										() -> hopper.getAutoEnabled()
-												// If automatic sorting is enabled, run the automatic intake command
-												? new IntakeHopper(hopper, shooter, centerer)
-												// If not, just turn on the hopper and centerer manually
-												: new ParallelCommandGroup(
+								new ToggleIntake(intake, IntakeState.INTAKE), // Start the intake
+								new SelectCommand( // Start the hopper
+										() -> hopper.getAutoEnabled() // If automatic sorting is enabled
+												? new IntakeHopper(hopper, shooter, centerer) // Auto intake
+												: new ParallelCommandGroup( // Manually intake
 														new ToggleHopper(hopper, HopperSetting.LOAD),
 														new ToggleCenterer(centerer, CentererState.CENTER)))))
-				// When the button is first pressed put the wrist out
-				.whenActive(new SetWrist(wrist, WristState.OUT))
-				// When the button is released put the wrist in
-				.whenInactive(new SetWrist(wrist, WristState.IN));
+				.whenActive(new SetWrist(wrist, WristState.OUT)) // When the button is first pressed put the wrist out
+				.whenInactive(new SetWrist(wrist, WristState.IN) // When the button is released put the wrist in
+				);
 
-		outtakeFrontButton
-				// While the button is pressed
-				.whileActiveOnce(
+		outtakeButton
+				.whileActiveOnce( // While the button is pressed
 						new ParallelCommandGroup(
-								// Reverse the intake
-								new ToggleIntake(intake, IntakeState.OUTTAKE),
-								// Reverse the centerers
-								new ToggleCenterer(centerer, CentererState.OUTTAKE)))
-				// When the button is first pressed put the wrist out
-				.whenActive(new SetWrist(wrist, WristState.OUT))
-				// When the button is released put the wrist in
-				.whenInactive(new SetWrist(wrist, WristState.IN))
-				// When automatic sorting is disabled set the hopper to unload cargo as well
-				.and(hopperEnabled.negate())
-				.whileActiveContinuous(new SetShooter(shooter, ShooterSetting.REVERSE.RPM))
-				.whileActiveOnce(new ToggleHopper(hopper, HopperSetting.OUTTAKETOP))
-				.whenInactive(new SetShooter(shooter, 0));
+								new ToggleIntake(intake, IntakeState.OUTTAKE), // Reverse the intake
+								new ToggleCenterer(centerer, CentererState.OUTTAKE))) // Reverse the centerers
+				.whenActive(new SetWrist(wrist, WristState.OUT)) // When the button is first pressed put the wrist out
+				.whenInactive(new SetWrist(wrist, WristState.IN)) // When the button is released put the wrist in
+				.and(hopperEnabled.negate()) // When automatic sorting is disabled
+				.whileActiveContinuous(new SetShooter(shooter, ShooterSetting.REVERSE.RPM)) // Reverse shooter
+				.whileActiveOnce(new ToggleHopper(hopper, HopperSetting.OUTTAKETOP)) // Reverse hopper
+				.whenInactive(new SetShooter(shooter, 0) // Turn off shooter when the command ends
+				);
 
-		new JoystickButton(driverController, Button.kRightBumper.value)
-				// .and(flywheelAtSpeed)
-				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
-		// .whenActive(new ShootCargo(hopper));
+		/* OPERATOR CONTROLLER */
+		new JoystickButton(operatorController, Button.kY.value)
+				.whileHeld(new LimelightAlign(drivetrain, limelight));
+
+		new JoystickButton(operatorController, Button.kBack.value)
+				.whenPressed(new InstantCommand(() -> wrist.resetEncoders()));
 
 		new JoystickButton(operatorController, Button.kLeftBumper.value)
 				.whenPressed(new ToggleAutoHopper(hopper));
 
 		new JoystickButton(operatorController, Button.kX.value)
-				// .and(limelightHasTarget)
+				.toggleWhenPressed(new ParallelCommandGroup(
+					//new SetShooter(shooter, shooter.getInterpolatedValue()),
+					//new HoodCommand(hood, hood.getInterpolatedValue())
+						// new InstantCommand(() -> shooter.set(shooter.getInterpolatedValue()), shooter),
+						// new InstantCommand(() -> hood.setAngle(hood.getInterpolatedValue()), hood)
+						new InterpolateShooter(shooter, hood),
+						new RumbleControllerRight(operatorController, 1)
+				));
+				//.whenInactive(new InstantCommand(()-> shooter.set(0), shooter));
+						//new RumbleControllerLeft(operatorController, 1)));
+
+		new JoystickButton(operatorController, Button.kA.value)
+				.toggleWhenActive(new ParallelCommandGroup(
+						new SetShooter(shooter, 1800),
+						new SetHood(hood, 0),
+						new RumbleControllerLeft(operatorController, 1)));
+
+		new JoystickButton(operatorController, Button.kB.value)
+				.toggleWhenActive(new ParallelCommandGroup(
+						new SetShooter(shooter, 1000),
+						new SetHood(hood, 1),
+						new RumbleControllerLeft(operatorController, 1)));
+
+		new JoystickButton(operatorController, Button.kRightBumper.value)
+				.whenPressed(new CalibrateHood(hood));
+
+		new JoystickButton(operatorController, Button.kStart.value)
+				.toggleWhenPressed(new TuneClimber(
+						climber,
+						() -> -operatorController.getRawAxis(Axis.kLeftY.value),
+						() -> -operatorController.getRawAxis(Axis.kRightY.value)),
+						false);
+
+		climberUp.whileActiveOnce(
+				new SetClimber(climber, () -> operatorController.getRawAxis(Axis.kRightTrigger.value)));
+
+		climberDown.whileActiveOnce(
+				new SetClimber(climber, () -> -operatorController.getRawAxis(Axis.kLeftTrigger.value)));
+
+		/* IDLE COMMANDS */
+		hopperFull.whileActiveContinuous(
+				new RumbleControllerRight(driverController, 0.2));
+
+		/* DEFAULT COMMANDS */
+		drivetrain.setDefaultCommand(
+				new FieldOrientedDrive(
+						drivetrain,
+						() -> -driverController.getLeftY(), // Forwards/backwards translation
+						() -> -driverController.getLeftX(), // Left/right translation
+						() -> -driverController.getRightX(), // Rotation
+						0.1, // Deadzone
+						() -> driverController.getRawButton(Button.kLeftBumper.value)) // Slow speed
+		);
+	}
+
+	/**
+	 * Fancier driver controls which allow changing the center of the rotation of
+	 * the robot
+	 */
+	private void configureButtonBindingsFancy() {
+		final Trigger intakeButton = new Trigger(() -> driverController.getRawAxis(Axis.kRightTrigger.value) > 0.3);
+		final Trigger outtakeButton = new Trigger(() -> driverController.getRawAxis(Axis.kLeftTrigger.value) > 0.3);
+		final Trigger climberUp = new Trigger(() -> operatorController.getRawAxis(Axis.kRightTrigger.value) > 0.3);
+		final Trigger climberDown = new Trigger(() -> operatorController.getRawAxis(Axis.kLeftTrigger.value) > 0.3);
+		final Trigger hopperEnabled = new Trigger(() -> hopper.getAutoEnabled());
+		final Trigger hopperFull = new Trigger(() -> hopper.isFull());
+		final Trigger flywheelAtSpeed = new Trigger(() -> shooter.atSetpoint(kControllerRumbleRange));
+
+		/* DRIVER CONTROLLER */
+		new JoystickButton(driverController, Button.kA.value)
+				.whenPressed(new ResetGyro(drivetrain));
+
+		new JoystickButton(driverController, Button.kY.value)
+				.whileActiveOnce(new XLock(drivetrain));
+
+		new JoystickButton(driverController, Button.kStart.value)
+				.toggleWhenActive(new LimelightTestingSetup(shooter, hood));
+
+		new JoystickButton(driverController, Button.kRightBumper.value)
+				.and(flywheelAtSpeed)
+				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
+		// .whenActive(new ShootCargo(hopper));
+
+		new JoystickButton(driverController, Button.kB.value).toggleWhenPressed(
+				new RobotOrientedDrive(
+						drivetrain,
+						() -> -driverController.getRightY(), // Forwards/backwards translation
+						() -> -driverController.getRightX(), // Left/right translation
+						() -> -driverController.getLeftX(), // Rotation
+						0.1, // Deadzone
+						() -> driverController.getRawButton(Button.kLeftBumper.value) // Slow speed
+				));
+
+		intakeButton
+				.and(hopperFull.negate()) // Makes the intake retract when we have two cargo
+				.whileActiveContinuous( // While the button is pressed
+						new ParallelCommandGroup(
+								new ToggleIntake(intake, IntakeState.INTAKE), // Start the intake
+								new SelectCommand( // Start the hopper
+										() -> hopper.getAutoEnabled() // If automatic sorting is enabled
+												? new IntakeHopper(hopper, shooter, centerer) // Auto intake
+												: new ParallelCommandGroup( // Manually intake
+														new ToggleHopper(hopper, HopperSetting.LOAD),
+														new ToggleCenterer(centerer, CentererState.CENTER)))))
+				.whenActive(new SetWrist(wrist, WristState.OUT)) // When the button is first pressed put the wrist out
+				.whenInactive(new SetWrist(wrist, WristState.IN) // When the button is released put the wrist in
+				);
+
+		outtakeButton
+				.whileActiveOnce(// While the button is pressed
+						new ParallelCommandGroup(
+								new ToggleIntake(intake, IntakeState.OUTTAKE), // Reverse the intake
+								new ToggleCenterer(centerer, CentererState.OUTTAKE))) // Reverse the centerers
+				.whenActive(new SetWrist(wrist, WristState.OUT)) // When the button is first pressed put the wrist out
+				.whenInactive(new SetWrist(wrist, WristState.IN)) // When the button is released put the wrist in
+				.and(hopperEnabled.negate()) // When automatic sorting is disabled
+				.whileActiveContinuous(new SetShooter(shooter, ShooterSetting.REVERSE.RPM)) // Reverse shooter
+				.whileActiveOnce(new ToggleHopper(hopper, HopperSetting.OUTTAKETOP)) // Reverse hopper
+				.whenInactive(new SetShooter(shooter, 0) // Turn off shooter when the command ends
+				);
+
+		/* OPERATOR CONTROLLER */
+		new JoystickButton(operatorController, Button.kY.value)
+				.whileHeld(new LimelightAlign(drivetrain, limelight));
+
+		new JoystickButton(operatorController, Button.kBack.value)
+				.whenPressed(new InstantCommand(() -> wrist.resetEncoders()));
+
+		new JoystickButton(operatorController, Button.kLeftBumper.value)
+				.whenPressed(new ToggleAutoHopper(hopper));
+
+		new JoystickButton(operatorController, Button.kX.value)
 				.toggleWhenActive(new ParallelCommandGroup(
 						new InterpolateShooter(shooter, hood),
 						new RumbleControllerLeft(operatorController, 1)));
@@ -214,12 +323,12 @@ public class RobotContainer {
 		new JoystickButton(operatorController, Button.kRightBumper.value)
 				.whenPressed(new CalibrateHood(hood));
 
-		new JoystickButton(operatorController, Button.kStart.value).toggleWhenPressed(
-				new TuneClimber(
+		new JoystickButton(operatorController, Button.kStart.value)
+				.toggleWhenPressed(new TuneClimber(
 						climber,
 						() -> -operatorController.getRawAxis(Axis.kLeftY.value),
 						() -> -operatorController.getRawAxis(Axis.kRightY.value)),
-				false);
+						false);
 
 		climberUp.whileActiveOnce(
 				new SetClimber(climber, () -> operatorController.getRawAxis(Axis.kRightTrigger.value)));
@@ -227,14 +336,27 @@ public class RobotContainer {
 		climberDown.whileActiveOnce(
 				new SetClimber(climber, () -> -operatorController.getRawAxis(Axis.kLeftTrigger.value)));
 
-		// flywheelAtSpeed.whileActiveOnce(new RumbleControllerRight(driverController,
-		// 0.2));
+		/* IDLE COMMANDS */
+		hopperFull.whileActiveContinuous(
+				new RumbleControllerRight(driverController, 0.2));
 
-		hopperFull.whileActiveContinuous(new RumbleControllerRight(driverController, 0.2));
+		/* DEFAULT COMMANDS */
+		drivetrain.setDefaultCommand(
+				new FieldOrientedDriveRotate(
+						drivetrain,
+						() -> -driverController.getRightY(), // Forwards/backwards translation
+						() -> -driverController.getRightX(), // Left/right translation
+						() -> -driverController.getLeftX(), // Rotation
+						0.1, // Deadzone
+						() -> driverController.getRawButton(Button.kLeftBumper.value), // Slow speed
+						() -> driverController.getPOV()) // Center of rotation
+		);
 	}
 
 	public Command getAutoCommand() {
-		return new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
+		return 
+		// new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
+		new ThreeBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
 	}
 
 	public Command getRobotInitCommand() {

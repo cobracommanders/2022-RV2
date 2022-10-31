@@ -7,11 +7,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
 import org.team498.lib.drivers.Limelight;
 import org.team498.lib.util.LinearInterpolator;
-
-import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -35,16 +34,13 @@ public class Hood extends SubsystemBase {
 		encoder = motor.getEncoder();
 		motor.setSmartCurrentLimit(20);
 		encoder.setPosition(0);
-		PID = new PIDController(0.1, 0, 0.0035); // P = 0.1 I = 0.0 D = 0.004
+		PID = new PIDController(0.1, 0, 0); // P = 0.1 I = 0.0 D = 0.0035
 		limit = new DigitalInput(kHoodLimitDIO);
 		motor.setIdleMode(IdleMode.kBrake);
 		this.limelight = limelight;
 
 		motor.setSoftLimit(SoftLimitDirection.kForward, 26F);
-
 		motor.enableSoftLimit(SoftLimitDirection.kForward, true);
-
-		// SmartDashboard.putNumber("Hood Angle", 0);
 	}
 
 	public enum ControlMode {
@@ -57,6 +53,7 @@ public class Hood extends SubsystemBase {
 	}
 
 	public void setAngle(double angle) {
+		setState(ControlMode.PID);
 		// Makes it so that the given angle is a number from 0 (low) to 1 (high)
 		PID.setSetpoint(angle * 26);
 		// PID1.setReference(angle, ControlType.kPosition);
@@ -84,9 +81,7 @@ public class Hood extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		// POSITIVE VALUES LOWER THE HOOD
 		double power = PID.calculate(encoder.getPosition());
-		SmartDashboard.putNumber("PID Reading", power);
 		if (currentControlMode == ControlMode.PID) {
 			if (!(Math.signum(power) == -1 && getLimit())) {
 				motor.set(power);
@@ -94,11 +89,16 @@ public class Hood extends SubsystemBase {
 				motor.set(0);
 			}
 		}
-		SmartDashboard.putBoolean("Hood powered", !(Math.signum(power) == -1 && getLimit()));
-		SmartDashboard.putBoolean("hood limit", getLimit());
-		SmartDashboard.putData(this);
+		// SmartDashboard.putBoolean("Hood powered", !(Math.signum(power) == -1 &&
+		// getLimit()));
+		// SmartDashboard.putBoolean("hood limit", getLimit());
+		// SmartDashboard.putData(this);
 		SmartDashboard.putNumber("hood encoder", encoder.getPosition());
-		SmartDashboard.putNumber("hood error", PID.getPositionError());
-		SmartDashboard.putString("Control mode", currentControlMode.toString());
+		SmartDashboard.putNumber("hood setpoint", PID.getSetpoint());
+		SmartDashboard.putNumber("Hood Interpolated value", getInterpolatedValue());
+		SmartDashboard.putNumber("T-limelight distance", limelight.getDistance());
+		// SmartDashboard.putNumber("hood error",
+		// PID.getPositionError());
+		// SmartDashboard.putString("Control mode", currentControlMode.toString());
 	}
 }

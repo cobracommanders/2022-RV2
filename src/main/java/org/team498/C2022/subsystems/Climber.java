@@ -5,7 +5,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -21,7 +20,6 @@ public class Climber extends SubsystemBase {
 		rightClimber.setIdleMode(IdleMode.kBrake);
 		leftClimber.setInverted(false);
 		rightClimber.setInverted(true);
-		//rightClimber.follow(leftClimber, true);
 	}
 
 	@Override
@@ -29,7 +27,7 @@ public class Climber extends SubsystemBase {
 		leftClimber.set(-leftSpeed);
 		rightClimber.set(-rightSpeed);
 
-		SmartDashboard.putNumber("climber encoder", leftEncoder.getPosition());
+		// SmartDashboard.putNumber("climber encoder", leftEncoder.getPosition());
 	}
 
 	public void setSpeedLeft(double speed) {

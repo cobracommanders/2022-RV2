@@ -17,7 +17,6 @@ public class CalibrateHood extends CommandBase {
 	@Override
 	public void initialize() {
 		hood.setState(ControlMode.MANUAL);
-		hood.setAngle(0);
 		hood.setMotor(-0.1);
 	}
 

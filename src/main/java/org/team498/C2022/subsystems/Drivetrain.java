@@ -1,44 +1,27 @@
 package org.team498.C2022.subsystems;
 
-import static org.team498.C2022.Constants.DrivetrainConstants.kBackLeftModuleDriveID;
-import static org.team498.C2022.Constants.DrivetrainConstants.kBackLeftModuleEncoderID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kBackLeftDriveMotorID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kBackLeftEncoderID;
 import static org.team498.C2022.Constants.DrivetrainConstants.kBackLeftModuleOffset;
-import static org.team498.C2022.Constants.DrivetrainConstants.kBackLeftModuleSteerID;
-import static org.team498.C2022.Constants.DrivetrainConstants.kBackRightModuleDriveID;
-import static org.team498.C2022.Constants.DrivetrainConstants.kBackRightModuleEncoderID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kBackLeftSteerMotorID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kBackRightDriveMotorID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kBackRightEncoderID;
 import static org.team498.C2022.Constants.DrivetrainConstants.kBackRightModuleOffset;
-import static org.team498.C2022.Constants.DrivetrainConstants.kBackRightModuleSteerID;
-import static org.team498.C2022.Constants.DrivetrainConstants.kDrivetrainTrackwidthMeters;
-import static org.team498.C2022.Constants.DrivetrainConstants.kDrivetrainWheelbaseMeters;
-import static org.team498.C2022.Constants.DrivetrainConstants.kFrontLeftModuleDriveID;
-import static org.team498.C2022.Constants.DrivetrainConstants.kFrontLeftModuleEncoderID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kBackRightSteerMotorID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kFrontLeftDriveMotorID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kFrontLeftEncoderID;
 import static org.team498.C2022.Constants.DrivetrainConstants.kFrontLeftModuleOffset;
-import static org.team498.C2022.Constants.DrivetrainConstants.kFrontLeftModuleSteerID;
-import static org.team498.C2022.Constants.DrivetrainConstants.kFrontRightModuleDriveID;
-import static org.team498.C2022.Constants.DrivetrainConstants.kFrontRightModuleEncoderID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kFrontLeftSteerMotorID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kFrontRightDriveMotorID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kFrontRightEncoderID;
 import static org.team498.C2022.Constants.DrivetrainConstants.kFrontRightModuleOffset;
-import static org.team498.C2022.Constants.DrivetrainConstants.kFrontRightModuleSteerID;
-
-import java.util.Optional;
+import static org.team498.C2022.Constants.DrivetrainConstants.kFrontRightSteerMotorID;
+import static org.team498.C2022.Constants.DrivetrainConstants.kMaxVelocityMetersPerSecond;
+import static org.team498.C2022.Constants.DrivetrainConstants.kSwerveModuleDistanceFromCenter;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.swervedrivespecialties.swervelib.Mk4ModuleConfiguration;
-import com.swervedrivespecialties.swervelib.Mk4iSwerveModuleHelper;
-import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
-import com.swervedrivespecialties.swervelib.SwerveModule;
 
-import org.team498.lib.control.CentripetalAccelerationConstraint;
-import org.team498.lib.control.FeedforwardConstraint;
-import org.team498.lib.control.HolonomicMotionProfiledTrajectoryFollower;
-import org.team498.lib.control.MaxAccelerationConstraint;
-import org.team498.lib.control.PIDConstants;
-import org.team498.lib.control.TrajectoryConstraint;
-import org.team498.lib.math.RigidTransform2;
-import org.team498.lib.math.Rotation2;
-import org.team498.lib.math.Vector2;
-import org.team498.lib.util.DrivetrainFeedforwardConstants;
-import org.team498.lib.util.HolonomicDriveSignal;
-import org.team498.lib.util.HolonomicFeedforward;
+import org.team498.lib.drivers.SwerveModule;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,115 +30,40 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drivetrain extends SubsystemBase {
-	/**
-	 * The maximum voltage that will be delivered to the drive motors.
-	 * <p>
-	 * This can be reduced to cap the robot's maximum speed. Typically, this is
-	 * useful during initial testing of the robot.
-	 */
-	public static final double kMaxVoltage = 12.0;
-	// The formula for calculating the theoretical maximum velocity is:
-	// <Motor free speed RPM> / 60 * <Drive reduction> * <Wheel diameter meters> *
-	// pi
-	// By default this value is setup for a Mk3 standard module using Falcon500s to
-	// drive.
-	// An example of this constant for a Mk4 L2 module with NEOs to drive is:
-	// 5880.0 / 60.0 / SdsModuleConfigurations.MK4_L2.getDriveReduction() *
-	// SdsModuleConfigurations.MK4_L2.getWheelDiameter() * Math.PI
-	/**
-	 * The maximum velocity of the robot in meters per second.
-	 * <p>
-	 * This is a measure of how fast the robot should be able to drive in a straight
-	 * line.
-	 */
-	public static final double kMaxVelocityMetersPerSecond = 6380.0 / 60.0 *
-			SdsModuleConfigurations.MK4I_L2.getDriveReduction() *
-			SdsModuleConfigurations.MK4I_L2.getWheelDiameter() * Math.PI;
-	/**
-	 * 0
-	 * The maximum angular velocity of the robot in radians per second.
-	 * <p>
-	 * This is a measure of how fast the robot can rotate in place.
-	 */
-	// Here we calculate the theoretical maximum angular velocity. You can also
-	// replace this with a measured amount.
-	public static final double maxAngularVelocityRadiansPerSecond = kMaxVelocityMetersPerSecond /
-			Math.hypot(kDrivetrainTrackwidthMeters / 2.0, kDrivetrainWheelbaseMeters / 2.0);
 
-	private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-			// Front left
-			new Translation2d(kDrivetrainTrackwidthMeters / 2.0, kDrivetrainWheelbaseMeters / 2.0),
-			// Front right
-			new Translation2d(kDrivetrainTrackwidthMeters / 2.0, -kDrivetrainWheelbaseMeters / 2.0),
-			// Back left
-			new Translation2d(-kDrivetrainTrackwidthMeters / 2.0, kDrivetrainWheelbaseMeters / 2.0),
-			// Back right
-			new Translation2d(-kDrivetrainTrackwidthMeters / 2.0, -kDrivetrainWheelbaseMeters / 2.0));
+	private final SwerveModule frontLeft;
+	private final SwerveModule frontRight;
+	private final SwerveModule backLeft;
+	private final SwerveModule backRight;
+	private final SwerveModule[] swerveModules;
 
-	private SwerveDriveOdometry odometry = new SwerveDriveOdometry(kinematics, getGyroAngle(),
-			new Pose2d(8, 4, Rotation2d.fromDegrees(0)));
+	private static SwerveDriveKinematics kinematics;
 
-	// private final PigeonIMU pigeon = new PigeonIMU(kPigeonID);
-	// private final ADXRS450_Gyro IMU = new ADXRS450_Gyro();
+	// Distance of the swerve modules from the center of the robot converted to
+	// meters
+	private final double moduleDistance = Units.inchesToMeters(kSwerveModuleDistanceFromCenter);
+
+	// Create positions for the swerve modules relative to the center of the robot
+
+	// This is used by the kinematics and would be mainly helpful for determining
+	// rotation on a non-square base or with more than 4 swerve modules
+	private final Translation2d frontLeftModulePosition = new Translation2d(moduleDistance, moduleDistance);
+	private final Translation2d frontRightModulePosition = new Translation2d(moduleDistance, -moduleDistance);
+	private final Translation2d backLeftModulePosition = new Translation2d(-moduleDistance, moduleDistance);
+	private final Translation2d backRightModulePosition = new Translation2d(-moduleDistance, -moduleDistance);
+
+	private final SwerveDriveOdometry odometry;
+
 	public static AHRS IMU = new AHRS(Port.kUSB1);
 
-	// These are our modules. We initialize them in the constructor.
-	private final SwerveModule frontLeftModule;
-	private final SwerveModule frontRightModule;
-	private final SwerveModule backLeftModule;
-	private final SwerveModule backRightModule;
-
-	private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
-
-	private final Mk4ModuleConfiguration configuration = new Mk4ModuleConfiguration();
-
-	public Drivetrain() {
-		configuration.setDriveCurrentLimit(35);
-		configuration.setSteerCurrentLimit(20);
-
-		frontLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
-				configuration,
-				Mk4iSwerveModuleHelper.GearRatio.L2,
-				kFrontLeftModuleDriveID,
-				kFrontLeftModuleSteerID,
-				kFrontLeftModuleEncoderID,
-				// This is how much the steer encoder is offset from true zero (In our case,
-				// zero is facing straight forward)
-				kFrontLeftModuleOffset);
-
-		frontRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-				configuration,
-				Mk4iSwerveModuleHelper.GearRatio.L2,
-				kFrontRightModuleDriveID,
-				kFrontRightModuleSteerID,
-				kFrontRightModuleEncoderID,
-				kFrontRightModuleOffset);
-
-		backLeftModule = Mk4iSwerveModuleHelper.createFalcon500(
-				configuration,
-				Mk4iSwerveModuleHelper.GearRatio.L2,
-				kBackLeftModuleDriveID,
-				kBackLeftModuleSteerID,
-				kBackLeftModuleEncoderID,
-				kBackLeftModuleOffset);
-
-		backRightModule = Mk4iSwerveModuleHelper.createFalcon500(
-				configuration,
-				Mk4iSwerveModuleHelper.GearRatio.L2,
-				kBackRightModuleDriveID,
-				kBackRightModuleSteerID,
-				kBackRightModuleEncoderID,
-				kBackRightModuleOffset);
-
-		System.out.println(kMaxVelocityMetersPerSecond);
-	}
+	private final Field2d field = new Field2d();
 
 	public void zeroGyro() {
 		IMU.reset();
@@ -165,89 +73,152 @@ public class Drivetrain extends SubsystemBase {
 		IMU.calibrate();
 	}
 
-	/**
-	 * Returns the reading of the gyro sensor from 180 to -180
-	 */
-	public Rotation2d getGyroAngle() {
-		return Rotation2d.fromDegrees(-IMU.getYaw());
+	public Drivetrain() {
+		frontLeft = new SwerveModule(
+				// Drive motor ID
+				kFrontLeftDriveMotorID,
+				// Steer Motor ID
+				kFrontLeftSteerMotorID,
+				// CANCoder ID
+				kFrontLeftEncoderID,
+				// Offset
+				kFrontLeftModuleOffset);
+
+		// Same for the rest of them
+		frontRight = new SwerveModule(kFrontRightDriveMotorID, kFrontRightSteerMotorID, kFrontRightEncoderID,
+				kFrontRightModuleOffset);
+		backLeft = new SwerveModule(kBackLeftDriveMotorID, kBackLeftSteerMotorID, kBackLeftEncoderID,
+				kBackLeftModuleOffset);
+		backRight = new SwerveModule(kBackRightDriveMotorID, kBackRightSteerMotorID, kBackRightEncoderID,
+				kBackRightModuleOffset);
+
+		// Create an array of all the swerve modules to make editing them easier
+		swerveModules = new SwerveModule[] {
+				frontLeft,
+				frontRight,
+				backLeft,
+				backRight
+		};
+
+		// Setup the kinematics
+		kinematics = new SwerveDriveKinematics(
+				frontLeftModulePosition,
+				frontRightModulePosition,
+				backLeftModulePosition,
+				backRightModulePosition);
+
+		odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(0));
+
+		matchEncoders();
+
+		resetOdometry(new Pose2d(8, 4, Rotation2d.fromDegrees(0)));
 	}
 
-	public double IMUAngle() {
-		return IMU.getAngle();
+	public void matchEncoders() {
+		for (SwerveModule swerveModule : swerveModules) {
+			swerveModule.matchEncoders();
+		}
+	}
+
+	public static SwerveDriveKinematics getKinematics() {
+		return kinematics;
+	}
+
+	public Pose2d getPose() {
+		return odometry.getPoseMeters();
+	}
+
+	public void resetOdometry(Pose2d pose) {
+		odometry.resetPosition(pose, Rotation2d.fromDegrees(getYaw()));
+	}
+
+	public void setModuleStates(SwerveModuleState[] moduleStates) {
+		setModuleStates(moduleStates, false);
+	}
+
+	public void setModuleStates(SwerveModuleState[] moduleStates, boolean force) {
+		SwerveDriveKinematics.desaturateWheelSpeeds(
+				// The optimized states
+				moduleStates,
+				// The maximum velocity of the robot
+				kMaxVelocityMetersPerSecond);
+
+		for (int i = 0; i < swerveModules.length; i++) {
+			// Set the motors of the swerve module to the calculated state
+			swerveModules[i].setState(moduleStates[i], force);
+		}
 	}
 
 	public void drive(ChassisSpeeds chassisSpeeds) {
-		this.chassisSpeeds = chassisSpeeds;
+		drive(chassisSpeeds, new Translation2d(0, 0));
 	}
 
-	private Field2d field = new Field2d();
-
-	private Rotation2 getAngularVelocity() {
-		return Rotation2.fromDegrees(IMU.getRate());
+	// Method to set the swerve drive to desired speed of direction and rotation
+	public void drive(ChassisSpeeds chassisSpeeds, Translation2d rotation) {
+		// Use the kinematics to set the desired speed and angle for each swerve module
+		// using the input velocities for direction and rotation
+		setModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds, rotation), false);
 	}
 
-	HolonomicDriveSignal driveSignal = new HolonomicDriveSignal(Vector2.ZERO, Rotation2.ZERO, false);
-	Vector2 velocity = Vector2.ZERO;
+	/**
+	 * @return The current yaw angle in degrees (-180 to 180)
+	 */
+	public double getYaw180() {
+		return -IMU.getYaw();
+	}
+
+	/**
+	 * @return The total accumulated yaw angle in degrees
+	 */
+	public double getYaw() {
+		return IMU.getAngle();
+	}
+
+	// Return an array of all the module states
+	public SwerveModuleState[] getModuleStates() {
+		return new SwerveModuleState[] {
+				frontLeft.getState(),
+				frontRight.getState(),
+				backLeft.getState(),
+				backRight.getState()
+		};
+	}
+
+	public double getSpeedX() {
+		ChassisSpeeds speed = kinematics.toChassisSpeeds(getModuleStates());
+		return speed.vxMetersPerSecond;
+	}
+	public double getSpeedY() {
+		ChassisSpeeds speed = kinematics.toChassisSpeeds(getModuleStates());
+		return speed.vyMetersPerSecond;
+	}
+
+	public boolean isMoving() {
+		ChassisSpeeds speed = kinematics.toChassisSpeeds(getModuleStates());
+		return ((Math.abs(speed.vxMetersPerSecond) + Math.abs(speed.vyMetersPerSecond)
+				+ Math.abs(speed.omegaRadiansPerSecond)) > 0.1);
+	}
+
+	// Set a number to 0 which counts up to 500 every 10 seconds to reset the
+	// encoders
+	private int encoderResetTimer = 0;
+	private int idleResetTimer = 0;
 
 	@Override
 	public void periodic() {
-		Optional<HolonomicDriveSignal> trajectorySignal = follower.update(
-				RigidTransform2.fromPose2d(odometry.getPoseMeters()),
-				velocity,
-				getAngularVelocity().toRadians(),
-				.3,
-				.1);
-		if (trajectorySignal.isPresent()) {
-			driveSignal = trajectorySignal.get();
-			driveSignal = new HolonomicDriveSignal(
-					driveSignal.getTranslation().scale(1.0 / RobotController.getBatteryVoltage()),
-					driveSignal.getRotation().toRadians() / RobotController.getBatteryVoltage(),
-					driveSignal.isFieldOriented());
-			chassisSpeeds = new ChassisSpeeds(driveSignal.getTranslation().x, driveSignal.getTranslation().y,
-					driveSignal.getRotation().toRadians());
+		odometry.update(Rotation2d.fromDegrees(-getYaw()), getModuleStates());
+		field.setRobotPose(getPose());
+		if (encoderResetTimer++ > 500 && !isMoving() && idleResetTimer++ > 50) {
+			matchEncoders();
+			encoderResetTimer = 0;
+			idleResetTimer = 0;
+		}
+		if (isMoving()) {
+			idleResetTimer = 0;
 		}
 
-		SmartDashboard.putNumber("Gyro", IMU.getAngle());
-		SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds);
-		SwerveDriveKinematics.desaturateWheelSpeeds(states, kMaxVelocityMetersPerSecond);
-
-		frontLeftModule.set(states[0].speedMetersPerSecond / kMaxVelocityMetersPerSecond * kMaxVoltage,
-				states[0].angle.getRadians());
-		frontRightModule.set(states[1].speedMetersPerSecond / kMaxVelocityMetersPerSecond * kMaxVoltage,
-				states[1].angle.getRadians());
-		backLeftModule.set(states[2].speedMetersPerSecond / kMaxVelocityMetersPerSecond * kMaxVoltage,
-				states[2].angle.getRadians());
-		backRightModule.set(states[3].speedMetersPerSecond / kMaxVelocityMetersPerSecond * kMaxVoltage,
-				states[3].angle.getRadians());
-
-		odometry.update(getGyroAngle(), states);
-		field.setRobotPose(odometry.getPoseMeters());
-		velocity = new Vector2(kinematics.toChassisSpeeds(states).vxMetersPerSecond,
-				kinematics.toChassisSpeeds(states).vyMetersPerSecond);
-		// SmartDashboard.putData(field);
-		SmartDashboard.putBoolean("Trajectory Active", trajectorySignal.isPresent());
-		SmartDashboard.putNumber("trajectory Distance", driveSignal.getTranslation().length);
-		SmartDashboard.putNumber("Chassis speeds",
-				Math.hypot(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond));
-	}
-
-	public static final DrivetrainFeedforwardConstants FEEDFORWARD_CONSTANTS = new DrivetrainFeedforwardConstants(
-			0.042746,
-			0.0032181,
-			0.30764);
-
-	public static final TrajectoryConstraint[] TRAJECTORY_CONSTRAINTS = {
-			new FeedforwardConstraint(11.0, FEEDFORWARD_CONSTANTS.getVelocityConstant(),
-					FEEDFORWARD_CONSTANTS.getAccelerationConstant(), false),
-			new MaxAccelerationConstraint(12.5 * 12.0),
-			new CentripetalAccelerationConstraint(15 * 12.0)
-	};
-	private final HolonomicMotionProfiledTrajectoryFollower follower = new HolonomicMotionProfiledTrajectoryFollower(
-			new PIDConstants(0.4, 0.0, 0.025),
-			new PIDConstants(5.0, 0.0, 0.0),
-			new HolonomicFeedforward(FEEDFORWARD_CONSTANTS));
-
-	public HolonomicMotionProfiledTrajectoryFollower getFollower() {
-		return follower;
+		SmartDashboard.putBoolean("moving", isMoving());
+		SmartDashboard.putData(field);
+		SmartDashboard.putNumber("gyro", getYaw180());
 	}
 }

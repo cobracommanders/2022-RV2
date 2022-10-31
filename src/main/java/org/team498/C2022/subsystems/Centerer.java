@@ -29,7 +29,6 @@ public class Centerer extends SubsystemBase {
 	public Centerer() {
 		motor.setIdleMode(IdleMode.kCoast);
 		motor.setInverted(true);
-
 	}
 
 	@Override

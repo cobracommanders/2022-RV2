@@ -14,7 +14,6 @@ public class Intake extends SubsystemBase {
 	private IntakeState currentState = IntakeState.IDLE;
 
 	public enum IntakeState {
-		// TODO Variable intake speed based on robot speed
 		INTAKE(kIntakeSpeed),
 		OUTTAKE(-kIntakeSpeed),
 		IDLE(0);
@@ -29,7 +28,6 @@ public class Intake extends SubsystemBase {
 	public Intake() {
 		motor.setNeutralMode(NeutralMode.Coast);
 		motor.setInverted(true);
-
 	}
 
 	@Override
