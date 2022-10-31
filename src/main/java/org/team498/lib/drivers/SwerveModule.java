@@ -1,13 +1,14 @@
 package org.team498.lib.drivers;
 
 import static org.team498.C2022.Constants.DrivetrainConstants.kDriveWheelCircumference;
+import static org.team498.C2022.Constants.DrivetrainConstants.kDriveWheelDiameter;
 import static org.team498.C2022.Constants.DrivetrainConstants.kMK4IDriveReductionL2;
 import static org.team498.C2022.Constants.DrivetrainConstants.kMK4ISteerReductionL2;
-import static org.team498.C2022.Constants.DrivetrainConstants.*;
+import static org.team498.C2022.Constants.DrivetrainConstants.kMaxVelocityMetersPerSecond;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -29,6 +30,8 @@ public class SwerveModule extends SubsystemBase {
 	private final CANCoder encoder;
 
 	private final double angleOffset;
+	private TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
+	private TalonFXConfiguration steerMotorConfig = new TalonFXConfiguration();
 
 	private double lastAngle;
 
@@ -39,6 +42,15 @@ public class SwerveModule extends SubsystemBase {
 
 		driveMotor.configFactoryDefault();
 		steerMotor.configFactoryDefault();
+
+		// driveMotorConfig.supplyCurrLimit.currentLimit = 35;
+		// driveMotorConfig.supplyCurrLimit.enable = true;
+
+		// steerMotorConfig.supplyCurrLimit.currentLimit = 20;
+		// steerMotorConfig.supplyCurrLimit.enable = true;
+		
+		// driveMotor.configAllSettings(driveMotorConfig);
+		// steerMotor.configAllSettings(steerMotorConfig);
 
 		driveMotor.setNeutralMode(NeutralMode.Brake);
 		driveMotor.configOpenloopRamp(1);
