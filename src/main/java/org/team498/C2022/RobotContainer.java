@@ -177,7 +177,8 @@ public class RobotContainer {
 					//new HoodCommand(hood, hood.getInterpolatedValue())
 						// new InstantCommand(() -> shooter.set(shooter.getInterpolatedValue()), shooter),
 						// new InstantCommand(() -> hood.setAngle(hood.getInterpolatedValue()), hood)
-						new InterpolateShooter(shooter, hood)
+						new InterpolateShooter(shooter, hood),
+						new RumbleControllerRight(operatorController, 1)
 				));
 				//.whenInactive(new InstantCommand(()-> shooter.set(0), shooter));
 						//new RumbleControllerLeft(operatorController, 1)));
@@ -354,7 +355,7 @@ public class RobotContainer {
 
 	public Command getAutoCommand() {
 		return 
-		
+		// new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
 		new ThreeBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
 	}
 
