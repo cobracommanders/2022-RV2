@@ -39,16 +39,15 @@ public class ThreeBall extends SequentialCommandGroup {
 				new CalibrateHood(hood),
 				new ResetGyro(drivetrain)),
 			new ParallelDeadlineGroup(
-				new WaitCommand(1.5), 
+				new WaitCommand(1.75), 
 				new LimelightAlign(drivetrain, limelight),
 				new InterpolateShooter(shooter, hood)),
 			new ParallelDeadlineGroup(
 				new SequentialCommandGroup(
 					new WaitCommand(.3),
 					new SetHopper(hopper, HopperSetting.LOAD),
-					new WaitCommand(0.2),
-					new SetHopper(hopper, HopperSetting.IDLE),
-					new WaitCommand(.3)
+					new WaitCommand(0.4),
+					new SetHopper(hopper, HopperSetting.IDLE)
 				),
 				new InterpolateShooter(shooter, hood)
 			),
@@ -57,24 +56,26 @@ public class ThreeBall extends SequentialCommandGroup {
 
 			//travel to ball 2
 			new ParallelDeadlineGroup(
-				new WaitCommand(.3),
+				new WaitCommand(.1),
 				new SetWrist(wrist, WristState.OUT),
-				new SetIntake(intake, IntakeState.INTAKE)
+				new SetIntake(intake, IntakeState.INTAKE),
+				new SetCenterer(centerer, CentererState.CENTER)
 				//new IntakeHopper(hopper, shooter, centerer)
 			),
 			new LinearRotationTrajectory(drivetrain, 1, 0, 0, 1),
-			new SetCenterer(centerer, CentererState.CENTER),
-			new SaveCargoHigh(hopper),
+			new ParallelDeadlineGroup(
+				new WaitCommand(1.5), 
+				new SaveCargoHigh(hopper)),
 			//new SetCenterer(centerer, CentererState.IDLE),
 			new RotatingLinearTrajectory(drivetrain, 0, 0, -95, 0),
 			//Travel to ball 3
 			new ParallelCommandGroup(
 				new SetWrist(wrist, WristState.OUT),
-				new SetIntake(intake, IntakeState.INTAKE)
+				new SetIntake(intake, IntakeState.INTAKE),
+				new SetCenterer(centerer, CentererState.CENTER)
 				//new IntakeHopper(hopper, shooter, centerer)
 			),
-			new SetCenterer(centerer, CentererState.CENTER),	
-			new LinearRotationTrajectory(drivetrain, 3, 1, 0, 1.5),
+			new LinearRotationTrajectory(drivetrain, 3, -0.75, 0, 1.5),
 			//new SetCenterer(centerer, CentererState.IDLE),
 			new ParallelCommandGroup(
 				new SetWrist(wrist, WristState.IN),
@@ -84,16 +85,55 @@ public class ThreeBall extends SequentialCommandGroup {
 			new RotatingLinearTrajectory(drivetrain, 0, 0, -120, 0),
 			//shoot balls
 			new ParallelDeadlineGroup(
-				new WaitCommand(1), 
+				new WaitCommand(1.5), 
 				new LimelightAlign(drivetrain, limelight),
 				new InterpolateShooter(shooter, hood)),
 			new ParallelDeadlineGroup(
-				new WaitCommand(5),
+				new WaitCommand(0.2),
 				new SetHopper(hopper, HopperSetting.LOAD),
 				new InterpolateShooter(shooter, hood)
 			),
+			new ParallelDeadlineGroup(
+				new WaitCommand(0.3),
+				new SetHopper(hopper, HopperSetting.IDLE),
+				new InterpolateShooter(shooter, hood)
+			),
+			new ParallelDeadlineGroup(
+				new WaitCommand(3),
+				new SetHopper(hopper, HopperSetting.LOAD),
+				new InterpolateShooter(shooter, hood)
+			),
+
 			new SetCenterer(centerer, CentererState.IDLE),
-			new SetHopper(hopper, HopperSetting.IDLE)
+			new SetHopper(hopper, HopperSetting.IDLE),
+			new RotatingLinearTrajectory(drivetrain, 0, 0, 120, 0),
+			new ParallelCommandGroup(
+				new SetWrist(wrist, WristState.OUT),
+				new SetIntake(intake, IntakeState.INTAKE),
+				new SetCenterer(centerer, CentererState.CENTER)
+				//new IntakeHopper(hopper, shooter, centerer)
+			),
+			new LinearRotationTrajectory(drivetrain, 6, -0.5, 0, 1.75),
+			new SaveCargoHigh(hopper),
+			new WaitCommand(1),
+			new LinearRotationTrajectory(drivetrain, -6, 0.5, 0, 1.75),
+			new RotatingLinearTrajectory(drivetrain, 0, 0, -120, 0),
+
+			new ParallelDeadlineGroup(
+				new SequentialCommandGroup(
+					new ParallelDeadlineGroup(
+						new WaitCommand(1.4), 
+						new LimelightAlign(drivetrain, limelight)),
+					new SetHopper(hopper, HopperSetting.LOAD),
+					new WaitCommand(0.2),
+					new SetHopper(hopper, HopperSetting.IDLE),
+					new WaitCommand(0.3),
+					new SetHopper(hopper, HopperSetting.LOAD),
+					new WaitCommand(3),
+					new SetHopper(hopper, HopperSetting.IDLE)
+				),
+				new InterpolateShooter(shooter, hood)
+			)
 		);
 	}
 
