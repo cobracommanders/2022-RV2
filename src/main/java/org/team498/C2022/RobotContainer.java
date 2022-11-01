@@ -12,7 +12,6 @@ import org.team498.C2022.commands.LimelightTestingSetup;
 import org.team498.C2022.commands.ResetGyro;
 import org.team498.C2022.commands.RumbleControllerLeft;
 import org.team498.C2022.commands.RumbleControllerRight;
-import org.team498.C2022.commands.auto.StateChampsTwoBall;
 import org.team498.C2022.commands.auto.TableFollower;
 import org.team498.C2022.commands.centerer.ToggleCenterer;
 import org.team498.C2022.commands.climber.SetClimber;
@@ -112,13 +111,13 @@ public class RobotContainer {
 
 		new JoystickButton(operatorController, Button.kY.value).whileHeld(new LimelightAlign(drivetrain, limelight));
 
-		new JoystickButton(driverController, Button.kBack.value).whenPressed(new SequentialCommandGroup(
+		new JoystickButton(driverController, Button.kBack.value).whenPressed(
 				// new ParabolicTrajectory(drivetrain, 1, 1, 0, 0, 1);
 				// new LinearTrajectory(drivetrain, 2, 2, 0, 1),
 				// new LinearTrajectory(drivetrain, 2, -2, 0, 2),
 				// new LinearTrajectory(drivetrain, 0, 2, 0, 2)
-
-				new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight)));
+				new TableFollower(drivetrain, Tables.DriveTables.trajectory1));
+				//new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight)));
 		// new RotatingLinearTrajectory(drivetrain, 0, 0, 90, 10)));
 
 		new JoystickButton(driverController, Button.kStart.value).toggleWhenActive(new SequentialCommandGroup(
@@ -188,7 +187,7 @@ public class RobotContainer {
 				.whileActiveOnce(new ToggleHopper(hopper, HopperSetting.OUTTAKETOP))
 				.whenInactive(new SetShooter(shooter, 0));
 
-		new JoystickButton(operatorController, Button.kStart.value)
+		new JoystickButton(operatorController, Button.kBack.value)
 			.toggleWhenActive(new ControllerApp(driverController, "trajectory1.txt"));
 			//TODO: Test the input recorder
 		new JoystickButton(driverController, Button.kRightBumper.value)

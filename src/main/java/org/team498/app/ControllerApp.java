@@ -1,7 +1,9 @@
 package org.team498.app;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -12,14 +14,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class ControllerApp extends CommandBase{
     //normally, I would make this a separate thing, but we want to run it at the same time as the robot
     //also this is the easiest way to access the controllers lol
-    private FileOutputStream outFS;
-    private PrintWriter printer;
+    private FileWriter printer;
     private XboxController controller;
-    private String fileName;
     private Timer timer = new Timer();
+	private File file;
     public ControllerApp(XboxController controller, String fileName) {
         this.controller = controller;
-        this.fileName = fileName;
+
+		File filepath = new File("/home/lvuser/paths".replace('/', File.separatorChar));
+		file = new File(filepath, fileName);
         openFile();
     }
     @Override
@@ -34,6 +37,8 @@ public class ControllerApp extends CommandBase{
         double dy = controller.getLeftX();
         double dr = controller.getRightX();
         printInfo(timeStamp, dx, dy, dr);
+
+		System.out.println("running");
     }
     @Override
     public void end(boolean interrupted) {
@@ -44,20 +49,32 @@ public class ControllerApp extends CommandBase{
     }
 
     private void printInfo(double timeStamp, double dx, double dy, double dr) {
-        printer.printf("{ %.3f, %.4f, %.4f, %.4f },\n", timeStamp, dx, dy, dr);
+		try {
+			printer.write(String.format("{ %.3f, %.4f, %.4f, %.4f },\n", timeStamp, dx, dy, dr));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        // printer.printf("{ %.3f, %.4f, %.4f, %.4f },\n", timeStamp, dx, dy, dr);
     }
 
     private void openFile() {
+		try {
+			file.createNewFile();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+
         try {
-            outFS = new FileOutputStream(fileName);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        printer = new PrintWriter(outFS);
+			printer = new FileWriter(file, true);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
+
     private void closeFile() {
         try {
-            outFS.close();
+            printer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

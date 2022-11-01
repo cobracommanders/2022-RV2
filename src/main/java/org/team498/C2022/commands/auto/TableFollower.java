@@ -6,6 +6,7 @@ import org.team498.lib.util.DriveInterpolator;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class TableFollower extends CommandBase {
@@ -23,6 +24,7 @@ public class TableFollower extends CommandBase {
         interpolator = new DriveInterpolator(DriveTables.trajectory1);
         addRequirements(drivetrain);
     }
+
     @Override
     public void initialize() {
         timer.start();
@@ -32,6 +34,7 @@ public class TableFollower extends CommandBase {
     public void execute() {
         time = timer.get();
         double[] state = getState(time);
+		SmartDashboard.putNumber("timer", time);
         drivetrain.drive(
             ChassisSpeeds.fromFieldRelativeSpeeds(
                     deadzone(((state[0] * driveSpeed) * (state[0] * driveSpeed)) * state[0], deadzone),
@@ -42,10 +45,11 @@ public class TableFollower extends CommandBase {
     }
     @Override
     public void end(boolean interrupted) {
-        drivetrain.drive(new ChassisSpeeds());
+        drivetrain.drive(new ChassisSpeeds(0,0,0));
         timer.stop();
         timer.reset();
     }
+
     @Override
     public boolean isFinished() {
         return interpolator.isFinished(time);
