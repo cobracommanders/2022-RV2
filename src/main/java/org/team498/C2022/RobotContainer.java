@@ -189,7 +189,7 @@ public class RobotContainer {
 				.whenInactive(new SetShooter(shooter, 0));
 
 		new JoystickButton(operatorController, Button.kStart.value)
-			.toggleWhenActive(new ControllerApp(driverController, "trajectory1.csv"));
+			.toggleWhenActive(new ControllerApp(driverController, "trajectory1.txt"));
 			//TODO: Test the input recorder
 		new JoystickButton(driverController, Button.kRightBumper.value)
 				// .and(flywheelAtSpeed)
