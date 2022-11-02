@@ -13,12 +13,15 @@ import java.util.Arrays;
  * 
  * Credit: FRC team 5013
  */
-public class DriveInterpolator {
+public class
+
+DriveInterpolator {
 
 	// https://therevisionist.org/software-engineering/java/tutorials/passing-2d-arrays/
 	private double[][] table;
 	private boolean initialized = false;
-	private int flexIndex = 0;
+	private boolean finished = false;
+	private int lastIndex;
 
 	/**
 	 * create linearInterpolator class
@@ -26,6 +29,7 @@ public class DriveInterpolator {
 	 * @param data, a table of x -> y mappings to be interpolated
 	 */
 	public DriveInterpolator(double[][] data) {
+		lastIndex = 0;
 		build_table(data);
 	}
 
@@ -52,6 +56,10 @@ public class DriveInterpolator {
 		initialized = true;
 	}
 
+	public boolean isFinished() {
+		return finished;
+	}
+
 	/**
 	 * getInterpolatedValue() - return the interpolated value of y given x.
 	 * 
@@ -68,12 +76,6 @@ public class DriveInterpolator {
 	 * @param x, the value of x to get an interpolated y value for
 	 * @return the linear interpolated value y
 	 */
-    public boolean isFinished(double time) {
-        if (flexIndex >= table.length) {
-            return true;
-        }
-        return false;
-    }
 	public double[] getInterpolatedValue(double x) {
 
 		if (!initialized) {
@@ -88,41 +90,35 @@ public class DriveInterpolator {
 		if (index >= table.length) {
 			return table[table.length - 1];
 		}
-        double high_x = table[index][1];
+		double high_x = table[index][1];
 		double high_y = table[index][2];
-        double high_r = table[index][3];
+		double high_r = table[index][3];
 		double high_t = table[index][0];
 		if ((high_t == x) || (index == 0)) {
-			return new double[] {high_t, high_x, high_y, high_r};
+			return new double[] { high_t, high_x, high_y, high_r };
 		}
-        double low_x = table[index - 1][1];
+		double low_x = table[index - 1][1];
 		double low_y = table[index - 1][2];
-        double low_r = table[index - 1][3];
+		double low_r = table[index - 1][3];
 		double low_t = table[index - 1][0];
 
 		return new double[] {
-            (low_x + (x - low_t) * (high_x - low_x) / (high_t - low_t)), 
-            (low_y + (x - low_t) * (high_y - low_y) / (high_t - low_t)),
-            (low_r + (x - low_t) * (high_r - low_r) / (high_t - low_t))
-        };
+				(low_x + (x - low_t) * (high_x - low_x) / (high_t - low_t)),
+				(low_y + (x - low_t) * (high_y - low_y) / (high_t - low_t)),
+				(low_r + (x - low_t) * (high_r - low_r) / (high_t - low_t))
+		};
 	}
-    //changed from linear search to binary -- since we use massive tables, we want it to be faster
-    public int getIndex(double time) {
-        int min = 0;
-        int max = table.length - 1;
-        int mid = (max + min) / 2;
-        while (time <= table[mid][0] - 0.1 || time >= table[mid][0] + 0.1) {
-            if (time > table[mid][0]) {
-                min = mid;
-            } else if (time < table[mid][0]) {
-                max = mid;
-            }
-            mid = min + max / 2;
-        }
-		flexIndex = mid;
-        return mid;
-    }
-	public int getFlexIndex() {
-		return flexIndex;
+
+	public int getIndex(double time) {
+		while (true) {
+			if (time <= table[lastIndex][0])
+				return lastIndex;
+			lastIndex++;
+
+			if (lastIndex == table.length) {
+				finished = true;
+				return lastIndex;
+			}
+		}
 	}
 }
