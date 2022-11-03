@@ -19,7 +19,9 @@ import org.team498.C2022.commands.climber.TuneClimber;
 import org.team498.C2022.commands.drivetrain.FieldOrientedDrive;
 import org.team498.C2022.commands.drivetrain.FieldOrientedDriveRotate;
 import org.team498.C2022.commands.drivetrain.LimelightAlign;
+import org.team498.C2022.commands.drivetrain.PathRecorder;
 import org.team498.C2022.commands.drivetrain.RobotOrientedDrive;
+import org.team498.C2022.commands.drivetrain.TrajectoryFollower;
 import org.team498.C2022.commands.drivetrain.XLock;
 import org.team498.C2022.commands.hood.CalibrateHood;
 import org.team498.C2022.commands.hood.SetHood;
@@ -115,7 +117,7 @@ public class RobotContainer {
 		new JoystickButton(driverController, Button.kA.value)
 				.whenPressed(new ResetGyro(drivetrain));
 
-		new JoystickButton(driverController, Button.kStart.value)
+		new JoystickButton(driverController, Button.kBack.value)
 				.toggleWhenActive(new LimelightTestingSetup(shooter, hood));
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
@@ -173,15 +175,15 @@ public class RobotContainer {
 
 		new JoystickButton(operatorController, Button.kX.value)
 				.toggleWhenPressed(new ParallelCommandGroup(
-					//new SetShooter(shooter, shooter.getInterpolatedValue()),
-					//new HoodCommand(hood, hood.getInterpolatedValue())
-						// new InstantCommand(() -> shooter.set(shooter.getInterpolatedValue()), shooter),
+						// new SetShooter(shooter, shooter.getInterpolatedValue()),
+						// new HoodCommand(hood, hood.getInterpolatedValue())
+						// new InstantCommand(() -> shooter.set(shooter.getInterpolatedValue()),
+						// shooter),
 						// new InstantCommand(() -> hood.setAngle(hood.getInterpolatedValue()), hood)
 						new InterpolateShooter(shooter, hood),
-						new RumbleControllerRight(operatorController, 1)
-				));
-				//.whenInactive(new InstantCommand(()-> shooter.set(0), shooter));
-						//new RumbleControllerLeft(operatorController, 1)));
+						new RumbleControllerRight(operatorController, 1)));
+		// .whenInactive(new InstantCommand(()-> shooter.set(0), shooter));
+		// new RumbleControllerLeft(operatorController, 1)));
 
 		new JoystickButton(operatorController, Button.kA.value)
 				.toggleWhenActive(new ParallelCommandGroup(
@@ -247,13 +249,23 @@ public class RobotContainer {
 		new JoystickButton(driverController, Button.kY.value)
 				.whileActiveOnce(new XLock(drivetrain));
 
-		new JoystickButton(driverController, Button.kStart.value)
-				.toggleWhenActive(new LimelightTestingSetup(shooter, hood));
-
 		new JoystickButton(driverController, Button.kRightBumper.value)
 				.and(flywheelAtSpeed)
 				.whileActiveContinuous(new ToggleHopper(hopper, HopperSetting.LOAD));
 		// .whenActive(new ShootCargo(hopper));
+
+		new JoystickButton(driverController, Button.kBack.value).toggleWhenPressed(
+				new PathRecorder(
+						drivetrain,
+						() -> -driverController.getRightY(), // Forwards/backwards translation
+						() -> -driverController.getRightX(), // Left/right translation
+						() -> -driverController.getLeftX(), // Rotation
+						0.1, // Deadzone
+						() -> driverController.getRawButton(Button.kLeftBumper.value) // Slow speed
+				));
+
+		new JoystickButton(driverController, Button.kStart.value).whenPressed(
+				new TrajectoryFollower(drivetrain, "testTrajectory"));
 
 		new JoystickButton(driverController, Button.kB.value).toggleWhenPressed(
 				new RobotOrientedDrive(
@@ -298,7 +310,7 @@ public class RobotContainer {
 				.whileHeld(new LimelightAlign(drivetrain, limelight));
 
 		new JoystickButton(operatorController, Button.kBack.value)
-				.whenPressed(new InstantCommand(() -> wrist.resetEncoders()));
+				.toggleWhenActive(new LimelightTestingSetup(shooter, hood));
 
 		new JoystickButton(operatorController, Button.kLeftBumper.value)
 				.whenPressed(new ToggleAutoHopper(hopper));
@@ -354,8 +366,9 @@ public class RobotContainer {
 	}
 
 	public Command getAutoCommand() {
-		return 
-		// new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
+		return
+		// new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist,
+		// centerer, limelight);
 		new ThreeBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
 	}
 

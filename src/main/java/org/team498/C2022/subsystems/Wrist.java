@@ -52,7 +52,6 @@ public class Wrist extends SubsystemBase {
 
 	@Override
 	public void periodic() {
-		System.out.println(calculate(currentState.position, encoder.getPosition()));
 		leftMotor.set(calculate(currentState.position, encoder.getPosition()));
 		rightMotor.set(calculate(currentState.position, encoder.getPosition()));
 		SmartDashboard.putNumber("wrist encoder", encoder.getPosition());

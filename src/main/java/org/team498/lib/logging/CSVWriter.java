@@ -18,15 +18,12 @@ public class CSVWriter {
 	public CSVWriter(String path, String name) {
 		File filepath = new File(path.replace('/', File.separatorChar));
 
-		if (!filepath.mkdirs()) {
-			new Exception("Could not create directory for csv file " + name).printStackTrace();
-		}
+		filepath.mkdirs();
 
 		file = new File(filepath, name + ".csv");
 
 		try {
-			if (!file.createNewFile())
-				new Exception("Could not create new csv file " + name).printStackTrace();
+			file.createNewFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

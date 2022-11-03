@@ -220,5 +220,6 @@ public class Drivetrain extends SubsystemBase {
 		SmartDashboard.putBoolean("moving", isMoving());
 		SmartDashboard.putData(field);
 		SmartDashboard.putNumber("gyro", getYaw180());
+		SmartDashboard.putData(this);
 	}
 }

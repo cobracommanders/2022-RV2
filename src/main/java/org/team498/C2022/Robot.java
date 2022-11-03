@@ -13,7 +13,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void robotInit() {
-		robotContainer = new RobotContainer(ControlSet.STANDARD);
+		robotContainer = new RobotContainer(ControlSet.FANCY);
 		robotContainer.getRobotInitCommand().schedule();
 	}
 

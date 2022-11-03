@@ -101,4 +101,7 @@ public final class Constants {
 		public static final double kBackLeftModuleOffset = 74.5;
 		public static final double kBackRightModuleOffset = 28.0;
 	}
+
+
+	public static final String kRoborioTrajectoryFilepath = "/home/lvuser/paths";
 }
