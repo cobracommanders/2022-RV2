@@ -67,7 +67,7 @@ public class PathRecorder extends CommandBase {
 						* rotation,
 				deadzone);
 
-		if (!timerStarted && (vx != 0 || vy != 0 || radiansPerSecond != 0)) {
+		if (!timerStarted && (Math.abs(vx) >= deadzone || Math.abs(vy) >= deadzone || Math.abs(radiansPerSecond) >= deadzone)) {
 			timerStarted = true;
 			SmartDashboard.putBoolean("recording auto", timerStarted);
 			recorder = new CSVWriter(kRoborioTrajectoryFilepath,

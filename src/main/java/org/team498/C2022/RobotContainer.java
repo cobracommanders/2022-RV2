@@ -13,6 +13,7 @@ import org.team498.C2022.commands.ResetGyro;
 import org.team498.C2022.commands.RumbleControllerLeft;
 import org.team498.C2022.commands.RumbleControllerRight;
 import org.team498.C2022.commands.auto.ThreeBall;
+import org.team498.C2022.commands.auto.TwoBallARL;
 import org.team498.C2022.commands.centerer.ToggleCenterer;
 import org.team498.C2022.commands.climber.SetClimber;
 import org.team498.C2022.commands.climber.TuneClimber;
@@ -25,6 +26,7 @@ import org.team498.C2022.commands.drivetrain.TrajectoryFollower;
 import org.team498.C2022.commands.drivetrain.XLock;
 import org.team498.C2022.commands.hood.CalibrateHood;
 import org.team498.C2022.commands.hood.SetHood;
+import org.team498.C2022.commands.hopper.EjectCargo;
 import org.team498.C2022.commands.hopper.IntakeHopper;
 import org.team498.C2022.commands.hopper.ToggleAutoHopper;
 import org.team498.C2022.commands.hopper.ToggleHopper;
@@ -119,8 +121,21 @@ public class RobotContainer {
 		new JoystickButton(driverController, Button.kA.value)
 				.whenPressed(new ResetGyro(drivetrain));
 
-		new JoystickButton(driverController, Button.kBack.value)
-				.toggleWhenActive(new LimelightTestingSetup(shooter, hood));
+		new JoystickButton(driverController, Button.kBack.value).toggleWhenPressed(
+		new PathRecorder(
+				drivetrain,
+				() -> -driverController.getRightY(), // Forwards/backwards translation
+				() -> -driverController.getRightX(), // Left/right translation
+				() -> -driverController.getLeftX(), // Rotation
+				0.1, // Deadzone
+				() -> driverController.getRawButton(Button.kLeftBumper.value) // Slow speed
+		));
+
+		new JoystickButton(driverController, Button.kStart.value).whenPressed(
+				new TrajectoryFollower(drivetrain, "trajectory2")
+				//new EjectCargo(hopper)
+				);
+
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
 				.and(flywheelAtSpeed)
@@ -144,7 +159,7 @@ public class RobotContainer {
 								new ToggleIntake(intake, IntakeState.INTAKE), // Start the intake
 								new SelectCommand( // Start the hopper
 										() -> hopper.getAutoEnabled() // If automatic sorting is enabled
-												? new IntakeHopper(hopper, shooter, centerer) // Auto intake
+												? new IntakeHopper(hopper, centerer) // Auto intake
 												: new ParallelCommandGroup( // Manually intake
 														new ToggleHopper(hopper, HopperSetting.LOAD),
 														new ToggleCenterer(centerer, CentererState.CENTER)))))
@@ -289,7 +304,7 @@ public class RobotContainer {
 								),
 								new SelectCommand( // Start the hopper
 										() -> hopper.getAutoEnabled() // If automatic sorting is enabled
-												? new IntakeHopper(hopper, shooter, centerer) // Auto intake
+												? new IntakeHopper(hopper, centerer) // Auto intake
 												: new ParallelCommandGroup( // Manually intake
 														new ToggleHopper(hopper, HopperSetting.LOAD),
 														new ToggleCenterer(centerer, CentererState.CENTER)))))
@@ -374,7 +389,9 @@ public class RobotContainer {
 		return
 		// new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist,
 		// centerer, limelight);
-		new ThreeBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
+		new TwoBallARL(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
+		//new TrajectoryFollower(drivetrain, "auto_1_leg_1.csv");
+		//new ThreeBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
 	}
 
 	public Command getRobotInitCommand() {

@@ -4,7 +4,7 @@ public class ShooterTable {
 	public static final double[][] shooterRPMTable = {
 			{ 62, 1800 },
 			{ 95, 2000 },
-			{ 105, 2100 },
+			{ 105, 2050 },
 			{ 115, 2150 },
 			{ 125, 2300 },
 			{ 150, 2225 },

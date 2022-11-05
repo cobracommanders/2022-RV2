@@ -12,15 +12,15 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 // Eject a cargo from the front of the hopper
 public class EjectCargo extends SequentialCommandGroup {
-	public EjectCargo(Hopper hopper, Shooter shooter) {
+	public EjectCargo(Hopper hopper) {
 		addRequirements(hopper);
 		addCommands(
 				new SetHopper(hopper, HopperSetting.OUTTAKE),
 				new WaitCommand(1),
-				new InstantCommand(() -> new SetShooter(shooter, ShooterSetting.REVERSE.RPM)),
+				//new InstantCommand(() -> new SetShooter(shooter, ShooterSetting.REVERSE.RPM)),
 				new SetHopper(hopper, HopperSetting.REVERSE),
 				new WaitCommand(0.3),
-				new SetHopper(hopper, HopperSetting.IDLE),
-				new InstantCommand(() -> new SetShooter(shooter, ShooterSetting.IDLE.RPM)));
+				new SetHopper(hopper, HopperSetting.IDLE));
+				//new InstantCommand(() -> new SetShooter(shooter, ShooterSetting.IDLE.RPM)));
 	}
 }

@@ -18,9 +18,8 @@ public class IntakeHopper extends CommandBase {
 	private Centerer centerer;
 	private Command intakeCommand;
 
-	public IntakeHopper(Hopper hopper, Shooter shooter, Centerer centerer) {
+	public IntakeHopper(Hopper hopper, Centerer centerer) {
 		this.hopper = hopper;
-		this.shooter = shooter;
 		this.centerer = centerer;
 		intakeCommand = new ParallelCommandGroup(
 				new ToggleHopper(this.hopper, HopperSetting.INTAKE),
@@ -36,7 +35,7 @@ public class IntakeHopper extends CommandBase {
 				break;
 
 			case INCORRECT:
-				new EjectCargo(hopper, shooter).schedule(false);
+				new EjectCargo(hopper).schedule(false);
 				break;
 
 			case IDLE:
