@@ -28,6 +28,7 @@ public class Intake extends SubsystemBase {
 	public Intake() {
 		motor.setNeutralMode(NeutralMode.Coast);
 		motor.setInverted(true);
+		motor.configOpenloopRamp(1);
 	}
 
 	@Override

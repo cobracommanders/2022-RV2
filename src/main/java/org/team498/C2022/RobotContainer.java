@@ -55,6 +55,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -281,7 +283,10 @@ public class RobotContainer {
 				.and(hopperFull.negate()) // Makes the intake retract when we have two cargo
 				.whileActiveContinuous( // While the button is pressed
 						new ParallelCommandGroup(
-								new ToggleIntake(intake, IntakeState.INTAKE), // Start the intake
+								new SequentialCommandGroup(
+									new WaitCommand(0.1),
+									new ToggleIntake(intake, IntakeState.INTAKE) // Start the intake
+								),
 								new SelectCommand( // Start the hopper
 										() -> hopper.getAutoEnabled() // If automatic sorting is enabled
 												? new IntakeHopper(hopper, shooter, centerer) // Auto intake

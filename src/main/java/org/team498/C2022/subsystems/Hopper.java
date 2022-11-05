@@ -47,7 +47,7 @@ public class Hopper extends SubsystemBase {
 
 		// System.out.println(currentState);
 		// System.out.println(queue);
-		// SmartDashboard.putBoolean("upper sensor", getUpperSensor());
+		SmartDashboard.putBoolean("upper sensor", getUpperSensor());
 		// SmartDashboard.putBoolean("correct color", getCargoState() ==
 		// HopperCargoState.CORRECT);
 		// SmartDashboard.putString("state", getOperation().toString());
@@ -55,7 +55,7 @@ public class Hopper extends SubsystemBase {
 		SmartDashboard.putNumber("red", colorSensor.getRed());
 		SmartDashboard.putNumber("blue", colorSensor.getBlue());
 		// SmartDashboard.putString("alliance", alliance.toString());
-		// SmartDashboard.putBoolean("lower sensor", getLowerSensor());
+		SmartDashboard.putBoolean("lower sensor", getLowerSensor());
 	}
 
 	public enum HopperSetting {
