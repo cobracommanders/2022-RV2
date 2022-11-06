@@ -22,6 +22,7 @@ import org.team498.C2022.commands.drivetrain.FieldOrientedDriveRotate;
 import org.team498.C2022.commands.drivetrain.LimelightAlign;
 import org.team498.C2022.commands.drivetrain.PathRecorder;
 import org.team498.C2022.commands.drivetrain.RobotOrientedDrive;
+import org.team498.C2022.commands.drivetrain.TableFollower;
 import org.team498.C2022.commands.drivetrain.TrajectoryFollower;
 import org.team498.C2022.commands.drivetrain.XLock;
 import org.team498.C2022.commands.hood.CalibrateHood;
@@ -132,8 +133,9 @@ public class RobotContainer {
 		));
 
 		new JoystickButton(driverController, Button.kStart.value).whenPressed(
-				new TrajectoryFollower(drivetrain, "trajectory2")
+				//new TrajectoryFollower(drivetrain, "trajectory2")
 				//new EjectCargo(hopper)
+				new TableFollower(drivetrain, DriveTable1.trajectory)
 				);
 
 

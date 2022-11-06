@@ -48,6 +48,7 @@ public class PathRecorder extends CommandBase {
 	public void initialize() {
 		SmartDashboard.putString("Trajectory name", "trajectory1");
 		SmartDashboard.putBoolean("recording auto", timerStarted);
+		
 	}
 
 	private boolean timerStarted = false;
