@@ -12,7 +12,6 @@ import org.team498.C2022.commands.LimelightTestingSetup;
 import org.team498.C2022.commands.ResetGyro;
 import org.team498.C2022.commands.RumbleControllerLeft;
 import org.team498.C2022.commands.RumbleControllerRight;
-import org.team498.C2022.commands.auto.ThreeBall;
 import org.team498.C2022.commands.auto.TwoBallARL;
 import org.team498.C2022.commands.centerer.ToggleCenterer;
 import org.team498.C2022.commands.climber.SetClimber;
@@ -27,7 +26,6 @@ import org.team498.C2022.commands.drivetrain.TrajectoryFollower;
 import org.team498.C2022.commands.drivetrain.XLock;
 import org.team498.C2022.commands.hood.CalibrateHood;
 import org.team498.C2022.commands.hood.SetHood;
-import org.team498.C2022.commands.hopper.EjectCargo;
 import org.team498.C2022.commands.hopper.IntakeHopper;
 import org.team498.C2022.commands.hopper.ToggleAutoHopper;
 import org.team498.C2022.commands.hopper.ToggleHopper;
@@ -206,7 +204,7 @@ public class RobotContainer {
 
 		new JoystickButton(operatorController, Button.kA.value)
 				.toggleWhenActive(new ParallelCommandGroup(
-						new SetShooter(shooter, 1800),
+						new SetShooter(shooter, 1900),
 						new SetHood(hood, 0),
 						new RumbleControllerLeft(operatorController, 1)));
 
