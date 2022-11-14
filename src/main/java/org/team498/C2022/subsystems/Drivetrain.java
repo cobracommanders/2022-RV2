@@ -31,6 +31,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.ADIS16448_IMU;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -61,7 +62,8 @@ public class Drivetrain extends SubsystemBase {
 
 	private final SwerveDriveOdometry odometry;
 
-	public static AHRS IMU = new AHRS(Port.kUSB1);
+	// public static AHRS IMU = new AHRS(Port.kUSB1);
+	public static ADIS16448_IMU IMU = new ADIS16448_IMU();
 
 	private final Field2d field = new Field2d();
 
@@ -164,13 +166,15 @@ public class Drivetrain extends SubsystemBase {
 	 * @return The current yaw angle in degrees (-180 to 180)
 	 */
 	public double getYaw180() {
-		return -IMU.getYaw();
+		// return -IMU.getYaw();
+		return -IMU.getAngle();
 	}
 
 	/**
 	 * @return The total accumulated yaw angle in degrees
 	 */
 	public double getYaw() {
+		// return IMU.getAngle();
 		return IMU.getAngle();
 	}
 
@@ -217,7 +221,7 @@ public class Drivetrain extends SubsystemBase {
 			idleResetTimer = 0;
 		}
 
-		SmartDashboard.putBoolean("moving", isMoving());
+		// SmartDashboard.putBoolean("moving", isMoving());
 		SmartDashboard.putData(field);
 		SmartDashboard.putNumber("gyro", getYaw180());
 		SmartDashboard.putData(this);

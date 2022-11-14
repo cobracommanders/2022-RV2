@@ -91,9 +91,9 @@ public class Shooter extends SubsystemBase {
 			leftMotor.neutralOutput();
 		}
 
-		SmartDashboard.putNumber("Actual RPM",
-				Falcon500Conversions.falconToRPM(leftMotor.getSelectedSensorVelocity(), 1));
-		SmartDashboard.putNumber("setpoint", setpoint);
+		// SmartDashboard.putNumber("Actual RPM",
+				// Falcon500Conversions.falconToRPM(leftMotor.getSelectedSensorVelocity(), 1));
+		// SmartDashboard.putNumber("setpoint", setpoint);
 
 		// SmartDashboard.putNumber("voltage used", leftMotor.getMotorOutputVoltage());
 	}

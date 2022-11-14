@@ -93,9 +93,9 @@ public class Hood extends SubsystemBase {
 		// getLimit()));
 		// SmartDashboard.putBoolean("hood limit", getLimit());
 		// SmartDashboard.putData(this);
-		SmartDashboard.putNumber("hood encoder", encoder.getPosition());
-		SmartDashboard.putNumber("hood setpoint", PID.getSetpoint());
-		SmartDashboard.putNumber("Hood Interpolated value", getInterpolatedValue());
+		// SmartDashboard.putNumber("hood encoder", encoder.getPosition());
+		// SmartDashboard.putNumber("hood setpoint", PID.getSetpoint());
+		// SmartDashboard.putNumber("Hood Interpolated value", getInterpolatedValue());
 		SmartDashboard.putNumber("T-limelight distance", limelight.getDistance());
 		// SmartDashboard.putNumber("hood error",
 		// PID.getPositionError());

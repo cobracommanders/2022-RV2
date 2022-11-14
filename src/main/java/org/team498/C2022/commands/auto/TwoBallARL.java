@@ -56,14 +56,14 @@ public class TwoBallARL extends SequentialCommandGroup {
                 new ParallelDeadlineGroup(
                     new SequentialCommandGroup(
                         new ParallelDeadlineGroup(
-                            new WaitCommand(1.4), 
+                            new WaitCommand(1.4),
                             new LimelightAlign(drivetrain, limelight)
                         ),
                         new SaveCargoHigh(hopper),
                         new SetHopper(hopper, HopperSetting.IDLE),
                         new WaitCommand(0.5),
                         new SetHopper(hopper, HopperSetting.LOAD),
-                        new WaitCommand(1),
+                        new WaitCommand(3.5),
                         new SetHopper(hopper, HopperSetting.IDLE)
                     ),
                     new InterpolateShooter(shooter, hood)

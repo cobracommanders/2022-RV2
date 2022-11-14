@@ -26,6 +26,7 @@ import org.team498.C2022.commands.drivetrain.TrajectoryFollower;
 import org.team498.C2022.commands.drivetrain.XLock;
 import org.team498.C2022.commands.hood.CalibrateHood;
 import org.team498.C2022.commands.hood.SetHood;
+import org.team498.C2022.commands.hopper.EjectCargo;
 import org.team498.C2022.commands.hopper.IntakeHopper;
 import org.team498.C2022.commands.hopper.ToggleAutoHopper;
 import org.team498.C2022.commands.hopper.ToggleHopper;
@@ -121,21 +122,19 @@ public class RobotContainer {
 				.whenPressed(new ResetGyro(drivetrain));
 
 		new JoystickButton(driverController, Button.kBack.value).toggleWhenPressed(
-		new PathRecorder(
-				drivetrain,
-				() -> -driverController.getRightY(), // Forwards/backwards translation
-				() -> -driverController.getRightX(), // Left/right translation
-				() -> -driverController.getLeftX(), // Rotation
-				0.1, // Deadzone
-				() -> driverController.getRawButton(Button.kLeftBumper.value) // Slow speed
-		));
+				new PathRecorder(
+						drivetrain,
+						() -> -driverController.getRightY(), // Forwards/backwards translation
+						() -> -driverController.getRightX(), // Left/right translation
+						() -> -driverController.getLeftX(), // Rotation
+						0.1, // Deadzone
+						() -> driverController.getRawButton(Button.kLeftBumper.value) // Slow speed
+				));
 
 		new JoystickButton(driverController, Button.kStart.value).whenPressed(
-				//new TrajectoryFollower(drivetrain, "trajectory2")
-				//new EjectCargo(hopper)
-				new TableFollower(drivetrain, DriveTable1.trajectory)
-				);
-
+				// new TrajectoryFollower(drivetrain, "trajectory2")
+				// new EjectCargo(hopper)
+				new TableFollower(drivetrain, DriveTable1.trajectory));
 
 		new JoystickButton(driverController, Button.kRightBumper.value)
 				.and(flywheelAtSpeed)
@@ -145,9 +144,9 @@ public class RobotContainer {
 		new JoystickButton(driverController, Button.kB.value).toggleWhenPressed(
 				new RobotOrientedDrive(
 						drivetrain,
-						() -> -driverController.getRightY(), // Forwards/backwards translation
-						() -> -driverController.getRightX(), // Left/right translation
-						() -> -driverController.getLeftX(), // Rotation
+						() -> -driverController.getLeftY(), // Forwards/backwards translation
+						() -> -driverController.getLeftX(), // Left/right translation
+						() -> -driverController.getRightX(), // Rotation
 						0.1, // Deadzone
 						() -> driverController.getRawButton(Button.kLeftBumper.value) // Slow speed
 				));
@@ -181,6 +180,9 @@ public class RobotContainer {
 				);
 
 		/* OPERATOR CONTROLLER */
+		new JoystickButton(operatorController, Button.kLeftStick.value)
+				.whenPressed(new EjectCargo(hopper));
+
 		new JoystickButton(operatorController, Button.kY.value)
 				.whileHeld(new LimelightAlign(drivetrain, limelight));
 
@@ -204,7 +206,7 @@ public class RobotContainer {
 
 		new JoystickButton(operatorController, Button.kA.value)
 				.toggleWhenActive(new ParallelCommandGroup(
-						new SetShooter(shooter, 1900),
+						new SetShooter(shooter, 1850),
 						new SetHood(hood, 0),
 						new RumbleControllerLeft(operatorController, 1)));
 
@@ -299,8 +301,8 @@ public class RobotContainer {
 				.whileActiveContinuous( // While the button is pressed
 						new ParallelCommandGroup(
 								new SequentialCommandGroup(
-									new WaitCommand(0.1),
-									new ToggleIntake(intake, IntakeState.INTAKE) // Start the intake
+										new WaitCommand(0.1),
+										new ToggleIntake(intake, IntakeState.INTAKE) // Start the intake
 								),
 								new SelectCommand( // Start the hopper
 										() -> hopper.getAutoEnabled() // If automatic sorting is enabled
@@ -390,8 +392,9 @@ public class RobotContainer {
 		// new StateChampsTwoBall(drivetrain, hood, shooter, hopper, intake, wrist,
 		// centerer, limelight);
 		new TwoBallARL(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
-		//new TrajectoryFollower(drivetrain, "auto_1_leg_1.csv");
-		//new ThreeBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer, limelight);
+		// new TrajectoryFollower(drivetrain, "auto_1_leg_1.csv");
+		// new ThreeBall(drivetrain, hood, shooter, hopper, intake, wrist, centerer,
+		// limelight);
 	}
 
 	public Command getRobotInitCommand() {

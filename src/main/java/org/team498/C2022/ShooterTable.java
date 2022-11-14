@@ -2,15 +2,15 @@ package org.team498.C2022;
 
 public class ShooterTable {
 	public static final double[][] shooterRPMTable = {
-			{ 62, 1800 },
-			{ 95, 2000 },
-			{ 105, 2050 },
-			{ 115, 2150 },
+			{ 62, 1900 },
+			{ 95, 2175 },
+			{ 105, 2200 },
+			{ 115, 2250 },
 			{ 125, 2300 },
 			{ 150, 2225 },
-			{ 165, 2900 },
-			{ 185, 2950 },
-			{ 200, 3350 }
+			{ 165, 2600 },
+			{ 185, 2650 },
+			{ 200, 3050 }
 	};
 
 	public static final double[][] hoodAngleTable = {

@@ -47,7 +47,7 @@ public class Hopper extends SubsystemBase {
 
 		// System.out.println(currentState);
 		// System.out.println(queue);
-		SmartDashboard.putBoolean("upper sensor", getUpperSensor());
+		// SmartDashboard.putBoolean("upper sensor", getUpperSensor());
 		// SmartDashboard.putBoolean("correct color", getCargoState() ==
 		// HopperCargoState.CORRECT);
 		// SmartDashboard.putString("state", getOperation().toString());
@@ -55,7 +55,7 @@ public class Hopper extends SubsystemBase {
 		SmartDashboard.putNumber("red", colorSensor.getRed());
 		SmartDashboard.putNumber("blue", colorSensor.getBlue());
 		// SmartDashboard.putString("alliance", alliance.toString());
-		SmartDashboard.putBoolean("lower sensor", getLowerSensor());
+		// SmartDashboard.putBoolean("lower sensor", getLowerSensor());
 	}
 
 	public enum HopperSetting {
@@ -113,8 +113,8 @@ public class Hopper extends SubsystemBase {
 
 		// If the alliance is blue and the reading from blue is stronger than red, or if
 		// the alliance is red with a stronger reading from red, return CORRECT
-		if ((alliance == Alliance.Blue && (colorSensor.getBlue() > colorSensor.getRed()))
-				|| (alliance == Alliance.Red && (colorSensor.getRed() > colorSensor.getBlue())))
+		if ((alliance == Alliance.Blue && (10000 > colorSensor.getRed()))
+				|| (alliance == Alliance.Red && (colorSensor.getRed() > 10000)))
 			return HopperState.CORRECT;
 		// Else, return INCORRECT
 		else
